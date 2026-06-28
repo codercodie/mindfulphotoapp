@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../data/test_feed_data.dart';
 import '../theme/text_styles.dart';
 import '../widgets/feed_card.dart';
+import 'profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -21,7 +22,16 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(height: 20),
 
           ...testFeedPosts.map((post) {
-            return FeedCard(post: post);
+            return FeedCard(
+              post: post,
+              onAuthorTap: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => ProfileScreen(userId: post.authorId),
+                  ),
+                );
+              },
+            );
           }),
         ],
       ),

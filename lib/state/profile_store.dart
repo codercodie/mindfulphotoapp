@@ -1,8 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/user_profile.dart';
 
-final profileStoreProvider =
-    NotifierProvider<ProfileStore, UserProfile>(ProfileStore.new);
+final profileStoreProvider = NotifierProvider<ProfileStore, UserProfile>(
+  ProfileStore.new,
+);
 
 class ProfileStore extends Notifier<UserProfile> {
   @override
@@ -24,21 +25,22 @@ class ProfileStore extends Notifier<UserProfile> {
       unlockedPromptPackIds: ['mindful_moments', 'self_reflection'],
     );
   }
-void updateProfile({
-  required String username,
-  required String displayName,
-  required String? pronouns,
-  required String bio,
-  required String? profileImagePath,
-}) {
-  state = state.copyWith(
-    username: username,
-    displayName: displayName,
-    pronouns: pronouns,
-    bio: bio,
-    profileImagePath: profileImagePath,
-  );
-}
+
+  void updateProfile({
+    required String username,
+    required String displayName,
+    required String? pronouns,
+    required String bio,
+    required String? profileImagePath,
+  }) {
+    state = state.copyWith(
+      username: username,
+      displayName: displayName,
+      pronouns: pronouns,
+      bio: bio,
+      profileImagePath: profileImagePath,
+    );
+  }
 
   void updateProfilePicture(String? imagePath) {
     state = state.copyWith(profileImagePath: imagePath);

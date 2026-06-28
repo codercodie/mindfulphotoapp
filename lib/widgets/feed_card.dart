@@ -6,14 +6,13 @@ import '../state/user_directory.dart';
 import '../theme/text_styles.dart';
 import 'profile_avatar.dart';
 import 'reaction_chip.dart';
+import 'post_image.dart';
 
 class FeedCard extends ConsumerWidget {
   final Post post;
+  final VoidCallback? onAuthorTap;
 
-  const FeedCard({
-    super.key,
-    required this.post,
-  });
+  const FeedCard({super.key, required this.post, this.onAuthorTap});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -34,33 +33,40 @@ class FeedCard extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // User information
-            Row(
-              children: [
-                ProfileAvatar(
-                  imagePath: author.profileImagePath,
-                  radius: 22,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        author.displayName,
-                        style: text.body.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
+            InkWell(
+              onTap: onAuthorTap,
+              borderRadius: BorderRadius.circular(16),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Row(
+                  children: [
+                    ProfileAvatar(
+                      imagePath: author.profileImagePath,
+                      radius: 22,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            author.displayName,
+                            style: text.body.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          Text(
+                            '@${author.username}',
+                            style: text.small.copyWith(
+                              color: colors.onSurface.withValues(alpha: 0.6),
+                            ),
+                          ),
+                        ],
                       ),
-                      Text(
-                        '@${author.username}',
-                        style: text.small.copyWith(
-                          color: colors.onSurface.withValues(alpha: 0.6),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
 
             const SizedBox(height: 16),
@@ -78,45 +84,24 @@ class FeedCard extends ConsumerWidget {
                 children: [
                   Text(
                     'Prompt',
-                    style: text.small.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: text.small.copyWith(fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 6),
-                  Text(
-                    post.prompt,
-                    style: text.prompt,
-                  ),
+                  Text(post.prompt, style: text.prompt),
                 ],
               ),
             ),
 
             const SizedBox(height: 14),
 
-            // Image placeholder
-            Container(
-              height: 260,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: colors.secondary.withValues(alpha: 0.18),
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(
-                  color: colors.onSurface.withValues(alpha: 0.16),
-                ),
-              ),
-              child: Icon(
-                Icons.photo_camera_outlined,
-                size: 48,
-                color: colors.onSurface.withValues(alpha: 0.55),
-              ),
+            // Image
+            PostImage(
+              imagePath: post.imagePath,
             ),
 
             const SizedBox(height: 14),
 
-            Text(
-              post.caption,
-              style: text.body,
-            ),
+            Text(post.caption, style: text.body),
 
             const SizedBox(height: 12),
 
@@ -132,11 +117,8 @@ class FeedCard extends ConsumerWidget {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: post.reactions.map((entry) {
-                return ReactionChip(
-                  reaction: entry.emoji,
-                  count: entry.count,
-                );
+              children: post.reactions.entries.map((entry) {
+                return ReactionChip(reaction: entry.key, count: entry.value);
               }).toList(),
             ),
           ],

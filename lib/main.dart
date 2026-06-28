@@ -7,13 +7,8 @@ import 'screens/profile_screen.dart';
 import 'screens/camera_screen.dart';
 import 'theme/build_theme.dart';
 
-
 void main() {
-  runApp(
-    const ProviderScope(
-      child: App(),
-    ),
-  );
+  runApp(const ProviderScope(child: App()));
 }
 
 class App extends StatelessWidget {
@@ -60,12 +55,17 @@ class _MainNavigationState extends State<MainNavigation> {
         },
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home_outlined), label: 'home'),
-          NavigationDestination(icon: Icon(Icons.auto_awesome_outlined), label: 'corners'),
-          NavigationDestination(icon: Icon(Icons.camera_alt_outlined), label: 'camera'),
+          NavigationDestination(
+            icon: Icon(Icons.auto_awesome_outlined),
+            label: 'corners',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.camera_alt_outlined),
+            label: 'camera',
+          ),
           NavigationDestination(icon: Icon(Icons.person_outline), label: 'me'),
         ],
       ),
     );
   }
 }
-

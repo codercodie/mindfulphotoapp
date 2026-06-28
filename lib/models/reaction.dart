@@ -1,11 +1,4 @@
-enum Reaction {
-  smile,
-  reflective,
-  wow,
-  sparkle,
-  hugs,
-  zen,
-}
+enum Reaction { smile, reflective, wow, sparkle, hugs, zen }
 
 extension ReactionLabel on Reaction {
   String get emoji {

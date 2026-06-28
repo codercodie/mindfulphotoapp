@@ -72,9 +72,7 @@ class _CameraScreenState extends State<CameraScreen> {
     final prompt = defaultPack.prompts.first;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('capture', style: text.quicksandHeading),
-      ),
+      appBar: AppBar(title: Text('capture', style: text.quicksandHeading)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
         child: Column(

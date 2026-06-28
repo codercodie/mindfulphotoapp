@@ -18,10 +18,9 @@ ThemeData buildTheme(ThemePack pack) {
       onSurface: pack.text,
     ),
 
-    textTheme: GoogleFonts.quicksandTextTheme(baseTextTheme).apply(
-      bodyColor: pack.text,
-      displayColor: pack.text,
-    ),
+    textTheme: GoogleFonts.quicksandTextTheme(
+      baseTextTheme,
+    ).apply(bodyColor: pack.text, displayColor: pack.text),
 
     appBarTheme: AppBarTheme(
       backgroundColor: pack.background,

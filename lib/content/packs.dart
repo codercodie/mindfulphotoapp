@@ -1,10 +1,6 @@
 import 'pack.dart';
 
-const List<Pack> packs = [
-  everydayPack,
-  naturePack,
-  indoorsPack,
-];
+const List<Pack> packs = [everydayPack, naturePack, indoorsPack];
 
 const everydayPack = Pack(
   id: 'everyday',
@@ -34,11 +30,7 @@ const naturePack = Pack(
   name: 'Nature Sparks',
   description: 'Small details from the world outside.',
   prompts: [
-    Prompt(
-      id: 'nature_001',
-      text: 'something growing.',
-      category: 'nature',
-    ),
+    Prompt(id: 'nature_001', text: 'something growing.', category: 'nature'),
     Prompt(
       id: 'nature_002',
       text: 'a texture from nature.',

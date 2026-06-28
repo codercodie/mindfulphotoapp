@@ -7,7 +7,7 @@ class Post {
   final String caption;
   final String? imagePath;
   final DateTime createdAt;
-  final List<Reaction> reactions;
+  final Map<Reaction, int> reactions;
 
   const Post({
     required this.id,

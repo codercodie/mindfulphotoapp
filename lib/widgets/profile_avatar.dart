@@ -6,11 +6,7 @@ class ProfileAvatar extends StatelessWidget {
   final String? imagePath;
   final double radius;
 
-  const ProfileAvatar({
-    super.key,
-    required this.imagePath,
-    this.radius = 58,
-  });
+  const ProfileAvatar({super.key, required this.imagePath, this.radius = 58});
 
   ImageProvider<Object>? _getImage() {
     final path = imagePath;

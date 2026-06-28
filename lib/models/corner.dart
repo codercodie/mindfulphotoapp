@@ -1,8 +1,4 @@
-enum CornerJoinType {
-  open,
-  request,
-  private,
-}
+enum CornerJoinType { open, request, private }
 
 class Corner {
   final String id;

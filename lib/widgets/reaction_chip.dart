@@ -5,11 +5,7 @@ class ReactionChip extends StatelessWidget {
   final Reaction reaction;
   final int count;
 
-  const ReactionChip({
-    super.key,
-    required this.reaction,
-    required this.count,
-  });
+  const ReactionChip({super.key, required this.reaction, required this.count});
 
   @override
   Widget build(BuildContext context) {
@@ -20,9 +16,7 @@ class ReactionChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surface,
         borderRadius: BorderRadius.circular(999),
-        border: Border.all(
-          color: colors.onSurface.withValues(alpha: 0.18),
-        ),
+        border: Border.all(color: colors.onSurface.withValues(alpha: 0.18)),
       ),
       child: Text(
         '${reaction.emoji} $count',
@@ -30,7 +24,6 @@ class ReactionChip extends StatelessWidget {
           color: colors.onSurface,
           fontWeight: FontWeight.w600,
           fontSize: 13,
-          fontFamily: 'Dustismo',
         ),
       ),
     );

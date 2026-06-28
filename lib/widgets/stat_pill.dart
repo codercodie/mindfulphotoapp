@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 class StatPill extends StatelessWidget {
   final String label;
 
-  const StatPill({
-    super.key,
-    required this.label,
-  });
+  const StatPill({super.key, required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -20,10 +17,7 @@ class StatPill extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: TextStyle(
-          color: colors.onSurface,
-          fontWeight: FontWeight.w500,
-        ),
+        style: TextStyle(color: colors.onSurface, fontWeight: FontWeight.w500),
       ),
     );
   }

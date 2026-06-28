@@ -3,11 +3,7 @@ class Prompt {
   final String text;
   final String category;
 
-  const Prompt({
-    required this.id,
-    required this.text,
-    required this.category,
-  });
+  const Prompt({required this.id, required this.text, required this.category});
 }
 
 class Pack {

@@ -13,8 +13,7 @@ class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
 
   @override
-  ConsumerState<EditProfileScreen> createState() =>
-      _EditProfileScreenState();
+  ConsumerState<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
 class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
@@ -35,48 +34,41 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
     _profileImagePath = profile.profileImagePath;
 
-    _displayNameController = TextEditingController(
-      text: profile.displayName,
-    );
+    _displayNameController = TextEditingController(text: profile.displayName);
 
-    _usernameController = TextEditingController(
-      text: profile.username,
-    );
+    _usernameController = TextEditingController(text: profile.username);
 
-    _pronounsController = TextEditingController(
-      text: profile.pronouns ?? '',
-    );
+    _pronounsController = TextEditingController(text: profile.pronouns ?? '');
 
-    _bioController = TextEditingController(
-      text: profile.bio,
-    );
+    _bioController = TextEditingController(text: profile.bio);
   }
 
-Future<void> _changeProfilePhoto() async {
-  final image = await _picker.pickImage(
-    source: ImageSource.gallery,
-    imageQuality: 85,
-    maxWidth: 1000,
-  );
+  Future<void> _changeProfilePhoto() async {
+    final image = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 85,
+      maxWidth: 1000,
+    );
 
-  if (image == null) return;
+    if (image == null) return;
 
-  final directory = await getApplicationDocumentsDirectory();
+    final directory = await getApplicationDocumentsDirectory();
 
-  final extension = path.extension(image.path).isEmpty
-      ? '.jpg'
-      : path.extension(image.path);
+    final extension = path.extension(image.path).isEmpty
+        ? '.jpg'
+        : path.extension(image.path);
 
-  final savedImage = await File(image.path).copy(
-    '${directory.path}/profile_${DateTime.now().millisecondsSinceEpoch}$extension',
-  );
+    final savedImage = await File(image.path).copy(
+      '${directory.path}/profile_${DateTime.now().millisecondsSinceEpoch}$extension',
+    );
 
-  if (!mounted) return;
+    if (!mounted) return;
 
-  setState(() {
-    _profileImagePath = savedImage.path;
-  });
-}
+    setState(() {
+      _profileImagePath = savedImage.path;
+    });
+  }
+
   void _saveProfile() {
     final displayName = _displayNameController.text.trim();
     final username = _usernameController.text.trim();
@@ -92,7 +84,9 @@ Future<void> _changeProfilePhoto() async {
       return;
     }
 
-    ref.read(profileStoreProvider.notifier).updateProfile(
+    ref
+        .read(profileStoreProvider.notifier)
+        .updateProfile(
           displayName: displayName,
           username: username,
           pronouns: pronouns.isEmpty ? null : pronouns,
@@ -117,22 +111,14 @@ Future<void> _changeProfilePhoto() async {
     final text = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'edit profile',
-          style: text.quicksandHeading,
-        ),
-      ),
-        body: SafeArea(
-          top: false,
-          child: ListView(
+      appBar: AppBar(title: Text('edit profile', style: text.quicksandHeading)),
+      body: SafeArea(
+        top: false,
+        child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
           children: [
             Center(
-              child: ProfileAvatar(
-                imagePath: _profileImagePath,
-                radius: 54,
-              ),
+              child: ProfileAvatar(imagePath: _profileImagePath, radius: 54),
             ),
             const SizedBox(height: 12),
             Center(
@@ -172,7 +158,7 @@ Future<void> _changeProfilePhoto() async {
             ),
           ],
         ),
-      )
+      ),
     );
   }
 }

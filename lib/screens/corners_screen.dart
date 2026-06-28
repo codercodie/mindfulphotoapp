@@ -11,22 +11,17 @@ class CornersScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final corners = ref.watch(cornerStoreProvider);
 
-    final joinedCorners =
-        corners.where((corner) => corner.isJoined).toList();
+    final joinedCorners = corners.where((corner) => corner.isJoined).toList();
 
-    final discoverCorners =
-        corners.where((corner) => !corner.isJoined).toList();
-    
+    final discoverCorners = corners
+        .where((corner) => !corner.isJoined)
+        .toList();
+
     final text = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
-        
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'corners',
-          style: text.quicksandHeading,
-        ),
-      ),
+      appBar: AppBar(title: Text('corners', style: text.quicksandHeading)),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(18, 8, 18, 100),
         children: [
@@ -53,7 +48,14 @@ class CornersScreen extends ConsumerWidget {
 
           _SectionTitle(title: 'discover'),
           const SizedBox(height: 12),
-          ...discoverCorners.map((corner) => CornerCard(corner: corner, onJoin: () {  },)),
+          ...discoverCorners.map(
+            (corner) => CornerCard(
+              corner: corner,
+              onJoin: () {
+                ref.read(cornerStoreProvider.notifier).joinCorner(corner.id);
+              },
+            ),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -88,11 +90,7 @@ class CornerCard extends StatelessWidget {
   final Corner corner;
   final VoidCallback onJoin;
 
-  const CornerCard({
-    super.key,
-    required this.corner,
-    required this.onJoin,
-  });
+  const CornerCard({super.key, required this.corner, required this.onJoin});
 
   @override
   Widget build(BuildContext context) {
@@ -108,10 +106,7 @@ class CornerCard extends StatelessWidget {
             CircleAvatar(
               radius: 28,
               backgroundColor: colors.secondary.withValues(alpha: 0.22),
-              child: Icon(
-                _cornerIcon(corner.id),
-                color: colors.primary,
-              ),
+              child: Icon(_cornerIcon(corner.id), color: colors.primary),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -143,16 +138,12 @@ class CornerCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
-            _JoinBadge(
-              corner: corner,
-              onTap: onJoin,
-            ),
+            _JoinBadge(corner: corner, onTap: onJoin),
           ],
         ),
       ),
     );
   }
-  
 
   IconData _cornerIcon(String id) {
     switch (id) {
@@ -174,20 +165,14 @@ class _JoinBadge extends StatelessWidget {
   final Corner corner;
   final VoidCallback onTap;
 
-  const _JoinBadge({
-    required this.corner,
-    required this.onTap,
-  });
+  const _JoinBadge({required this.corner, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
 
     if (corner.isJoined) {
-      return Icon(
-        Icons.check_circle_outline,
-        color: colors.primary,
-      );
+      return Icon(Icons.check_circle_outline, color: colors.primary);
     }
 
     final label = switch (corner.joinType) {

@@ -43,10 +43,7 @@ const mistPack = ThemePack(
   unlocked: false,
 );
 
-const themePacks = [
-  softMossPack,
-  peachCalmPack,
-  mistPack,
-];
+const themePacks = [softMossPack, peachCalmPack, mistPack];
 
-const activeThemePack = peachCalmPack; // Change this to switch the active theme pack
+const activeThemePack =
+    peachCalmPack; // Change this to switch the active theme pack

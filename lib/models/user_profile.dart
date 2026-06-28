@@ -60,21 +60,16 @@ class UserProfile {
           ? this.pronouns
           : pronouns as String?,
 
-      bio: identical(bio, _notProvided)
-          ? this.bio
-          : bio as String?,
+      bio: identical(bio, _notProvided) ? this.bio : bio as String?,
 
       cornerIds: cornerIds ?? this.cornerIds,
       friendIds: friendIds ?? this.friendIds,
       followerIds: followerIds ?? this.followerIds,
       followingIds: followingIds ?? this.followingIds,
       profileImagePath: profileImagePath ?? this.profileImagePath,
-      enabledThemePackId:
-          enabledThemePackId ?? this.enabledThemePackId,
-      unlockedThemePackIds:
-          unlockedThemePackIds ?? this.unlockedThemePackIds,
-      enabledPromptPackIds:
-          enabledPromptPackIds ?? this.enabledPromptPackIds,
+      enabledThemePackId: enabledThemePackId ?? this.enabledThemePackId,
+      unlockedThemePackIds: unlockedThemePackIds ?? this.unlockedThemePackIds,
+      enabledPromptPackIds: enabledPromptPackIds ?? this.enabledPromptPackIds,
       unlockedPromptPackIds:
           unlockedPromptPackIds ?? this.unlockedPromptPackIds,
     );
