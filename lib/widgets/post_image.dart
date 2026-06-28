@@ -5,10 +5,7 @@ import 'package:flutter/material.dart';
 class PostImage extends StatelessWidget {
   final String? imagePath;
 
-  const PostImage({
-    super.key,
-    required this.imagePath,
-  });
+  const PostImage({super.key, required this.imagePath});
 
   ImageProvider<Object>? _getImageProvider() {
     final value = imagePath?.trim();
@@ -38,7 +35,7 @@ class PostImage extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(22),
       child: AspectRatio(
-        aspectRatio: 4 / 3,
+        aspectRatio: 1,
         child: imageProvider == null
             ? _ImagePlaceholder(colors: colors)
             : Image(
@@ -57,9 +54,7 @@ class PostImage extends StatelessWidget {
 class _ImagePlaceholder extends StatelessWidget {
   final ColorScheme colors;
 
-  const _ImagePlaceholder({
-    required this.colors,
-  });
+  const _ImagePlaceholder({required this.colors});
 
   @override
   Widget build(BuildContext context) {
@@ -67,9 +62,7 @@ class _ImagePlaceholder extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         color: colors.secondary.withValues(alpha: 0.18),
-        border: Border.all(
-          color: colors.onSurface.withValues(alpha: 0.16),
-        ),
+        border: Border.all(color: colors.onSurface.withValues(alpha: 0.16)),
       ),
       child: Icon(
         Icons.photo_camera_outlined,

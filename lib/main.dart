@@ -35,18 +35,25 @@ class MainNavigation extends StatefulWidget {
 class _MainNavigationState extends State<MainNavigation> {
   int selectedIndex = 0;
 
-  final screens = const [
-    HomeScreen(),
-    CornersScreen(),
-    CameraScreen(),
-    ProfileScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final screens = [
+      const HomeScreen(),
+      const CornersScreen(),
+      CameraScreen(
+        onGlimmerSaved: () {
+          setState(() {
+            selectedIndex = 0;
+          });
+        },
+      ),
+      const ProfileScreen(),
+    ];
     return Scaffold(
-      body: screens[selectedIndex],
+      body: IndexedStack(index: selectedIndex, children: screens),
       bottomNavigationBar: NavigationBar(
+        height: 66,
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
         selectedIndex: selectedIndex,
         onDestinationSelected: (index) {
           setState(() {
@@ -54,16 +61,26 @@ class _MainNavigationState extends State<MainNavigation> {
           });
         },
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.home_outlined), label: 'home'),
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined),
+            selectedIcon: Icon(Icons.home),
+            label: 'home',
+          ),
           NavigationDestination(
             icon: Icon(Icons.auto_awesome_outlined),
+            selectedIcon: Icon(Icons.auto_awesome),
             label: 'corners',
           ),
           NavigationDestination(
-            icon: Icon(Icons.camera_alt_outlined),
-            label: 'camera',
+            icon: Icon(Icons.add_circle_outline, size: 31),
+            selectedIcon: Icon(Icons.add_circle, size: 31),
+            label: 'add glimmer',
           ),
-          NavigationDestination(icon: Icon(Icons.person_outline), label: 'me'),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person),
+            label: 'me',
+          ),
         ],
       ),
     );

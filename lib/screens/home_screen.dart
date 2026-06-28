@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-import '../data/test_feed_data.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../state/post_store.dart';
 import '../theme/text_styles.dart';
 import '../widgets/feed_card.dart';
-import 'profile_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final text = Theme.of(context).textTheme;
+    final posts = ref.watch(postStoreProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -21,17 +23,8 @@ class HomeScreen extends StatelessWidget {
           const SizedBox(height: 6),
           const SizedBox(height: 20),
 
-          ...testFeedPosts.map((post) {
-            return FeedCard(
-              post: post,
-              onAuthorTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => ProfileScreen(userId: post.authorId),
-                  ),
-                );
-              },
-            );
+          ...posts.map((post) {
+            return FeedCard(post: post);
           }),
         ],
       ),

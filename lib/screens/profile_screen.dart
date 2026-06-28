@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../data/test_feed_data.dart';
+import '../state/post_store.dart';
 import '../state/profile_store.dart';
 import '../state/user_directory.dart';
 import '../theme/text_styles.dart';
@@ -30,11 +29,7 @@ class ProfileScreen extends ConsumerWidget {
 
     final isCurrentUser = profile.id == currentUser.id;
 
-    final profilePosts = testFeedPosts
-        .where((post) => post.authorId == profile.id)
-        .toList();
-
-    final favoritePosts = profilePosts.take(2).toList();
+    final profilePosts = ref.watch(postsByUserProvider(profile.id));
 
     final hasPronouns =
         profile.pronouns != null && profile.pronouns!.trim().isNotEmpty;
@@ -155,29 +150,28 @@ class ProfileScreen extends ConsumerWidget {
           Row(
             children: [
               Text(
-                'favorite glimmers',
+                'glimmers',
                 style: text.quicksandHeading.copyWith(
                   fontSize: 22,
                   fontWeight: FontWeight.w600,
                 ),
               ),
               const Spacer(),
-              TextButton(onPressed: () {}, child: const Text('see all')),
             ],
           ),
           const SizedBox(height: 10),
-          if (favoritePosts.isEmpty)
+          if (profilePosts.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 24),
               child: Text(
-                'No favorite glimmers yet.',
+                "No glimmers yet :'(",
                 style: text.quicksandBody.copyWith(
                   color: colors.onSurface.withValues(alpha: 0.6),
                 ),
               ),
             )
           else
-            ...favoritePosts.map(
+            ...profilePosts.map(
               (post) => Padding(
                 padding: const EdgeInsets.only(bottom: 18),
                 child: FeedCard(post: post),

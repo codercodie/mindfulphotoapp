@@ -74,7 +74,7 @@ class FeedCard extends ConsumerWidget {
             // Prompt
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
                 color: colors.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(18),
@@ -84,10 +84,16 @@ class FeedCard extends ConsumerWidget {
                 children: [
                   Text(
                     'Prompt',
-                    style: text.small.copyWith(fontWeight: FontWeight.w700),
+                    style: text.small.copyWith(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12,
+                    ),
                   ),
-                  const SizedBox(height: 6),
-                  Text(post.prompt, style: text.prompt),
+                  const SizedBox(height: 4),
+                  Text(
+                    post.prompt,
+                    style: text.prompt.copyWith(fontSize: 18, height: 1.25),
+                  ),
                 ],
               ),
             ),
@@ -95,9 +101,7 @@ class FeedCard extends ConsumerWidget {
             const SizedBox(height: 14),
 
             // Image
-            PostImage(
-              imagePath: post.imagePath,
-            ),
+            PostImage(imagePath: post.imagePath),
 
             const SizedBox(height: 14),
 
