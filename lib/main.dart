@@ -1,25 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:spark/theme/themes.dart' as theme show activeThemePack;
 import 'screens/home_screen.dart';
 import 'screens/corners_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/camera_screen.dart';
 import 'theme/build_theme.dart';
+import 'state/active_theme_provider.dart';
 
 void main() {
   runApp(const ProviderScope(child: App()));
 }
 
-class App extends StatelessWidget {
+class App extends ConsumerWidget {
   const App({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final activeTheme = ref.watch(activeThemePackProvider);
+
     return MaterialApp(
       title: 'wabisnaps',
       debugShowCheckedModeBanner: false,
-      theme: buildTheme(theme.activeThemePack),
+      theme: buildTheme(activeTheme),
       home: const MainNavigation(),
     );
   }

@@ -47,13 +47,13 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
       compressQuality: 90,
       uiSettings: [
         AndroidUiSettings(
-          toolbarTitle: 'crop glimmer',
+          toolbarTitle: 'crop your glimmer',
           initAspectRatio: CropAspectRatioPreset.square,
           lockAspectRatio: true,
           aspectRatioPresets: [CropAspectRatioPreset.square],
         ),
         IOSUiSettings(
-          title: 'crop glimmer',
+          title: 'crop your glimmer',
           aspectRatioLockEnabled: true,
           resetAspectRatioEnabled: false,
           aspectRatioPickerButtonHidden: true,
@@ -174,9 +174,9 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
         return;
       }
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Could not save glimmer: $error')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(':( could not save glimmer: $error')),
+      );
     }
   }
 
@@ -195,11 +195,14 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
     return Scaffold(
       appBar: AppBar(title: Text('capture', style: text.quicksandHeading)),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('capture a glimmer', style: text.quicksandHeading),
+            Text(
+              "capture a glimmer inspired by today's prompt:",
+              style: text.quicksandHeading,
+            ),
             const SizedBox(height: 8),
             Text(
               prompt.text,

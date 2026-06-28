@@ -19,11 +19,38 @@ class ProfileStore extends Notifier<UserProfile> {
       friendIds: ['user_002', 'user_003', 'user_004'],
       followerIds: ['user_002', 'user_003', 'user_004', 'user_005'],
       followingIds: ['user_002', 'user_006'],
-      enabledThemePackId: 'soft_moss',
-      unlockedThemePackIds: ['soft_moss', 'mist'],
-      enabledPromptPackIds: ['mindful_moments'],
-      unlockedPromptPackIds: ['mindful_moments', 'self_reflection'],
+      enabledThemePackId: 'peach_calm',
+      unlockedThemePackIds: ['soft_moss', 'peach_calm'],
+
+      enabledPromptPackIds: ['everyday'],
+      unlockedPromptPackIds: ['everyday', 'nature'],
     );
+  }
+
+  void updateThemePack(String themePackId) {
+    if (!state.unlockedThemePackIds.contains(themePackId)) {
+      return;
+    }
+
+    state = state.copyWith(enabledThemePackId: themePackId);
+  }
+
+  void setPromptPackEnabled(String promptPackId, bool enabled) {
+    if (!state.unlockedPromptPackIds.contains(promptPackId)) {
+      return;
+    }
+
+    final updatedPacks = List<String>.from(state.enabledPromptPackIds);
+
+    if (enabled) {
+      if (!updatedPacks.contains(promptPackId)) {
+        updatedPacks.add(promptPackId);
+      }
+    } else {
+      updatedPacks.remove(promptPackId);
+    }
+
+    state = state.copyWith(enabledPromptPackIds: updatedPacks);
   }
 
   void updateProfile({

@@ -8,6 +8,7 @@ import '../widgets/feed_card.dart';
 import '../widgets/profile_avatar.dart';
 import '../widgets/profile_stat.dart';
 import 'edit_profile_screen.dart';
+import 'settings_screen.dart';
 
 class ProfileScreen extends ConsumerWidget {
   final String? userId;
@@ -56,7 +57,11 @@ class ProfileScreen extends ConsumerWidget {
             ),
             IconButton(
               tooltip: 'Settings',
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                );
+              },
               icon: const Icon(Icons.settings_outlined),
             ),
           ] else

@@ -18,7 +18,13 @@ final List<Post> testFeedPosts = [
     caption: 'Palm in the moment.',
     imagePath: 'assets/posts/palm.jpeg',
     createdAt: DateTime(2026, 6, 17),
-    reactions: {Reaction.reflective: 8, Reaction.hugs: 2, Reaction.zen: 10},
+    reactions: {
+      Reaction.reflective: 8,
+      Reaction.hugs: 2,
+      Reaction.zen: 10,
+      Reaction.smile: 1,
+      Reaction.sparkle: 3,
+    },
   ),
   Post(
     id: 'post_003',

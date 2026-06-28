@@ -44,6 +44,3 @@ const mistPack = ThemePack(
 );
 
 const themePacks = [softMossPack, peachCalmPack, mistPack];
-
-const activeThemePack =
-    peachCalmPack; // Change this to switch the active theme pack
