@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../models/post.dart';
+import '../state/user_directory.dart';
 import '../theme/text_styles.dart';
+import 'profile_avatar.dart';
 import 'reaction_chip.dart';
 
-class FeedCard extends StatelessWidget {
+class FeedCard extends ConsumerWidget {
   final Post post;
 
   const FeedCard({
@@ -12,9 +16,15 @@ class FeedCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final text = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
+
+    final author = ref.watch(userByIdProvider(post.authorId));
+
+    if (author == null) {
+      return const SizedBox.shrink();
+    }
 
     return Card(
       margin: const EdgeInsets.only(bottom: 20),
@@ -23,32 +33,32 @@ class FeedCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // User row
+            // User information
             Row(
               children: [
-                CircleAvatar(
+                ProfileAvatar(
+                  imagePath: author.profileImagePath,
                   radius: 22,
-                  backgroundColor: colors.secondary,
-                  child: Text(
-                    post.displayName[0],
-                    style: TextStyle(
-                      color: colors.onSecondary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
                 ),
                 const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(post.displayName, style: text.body.copyWith(fontWeight: FontWeight.w700)),
-                    Text(
-                      post.username,
-                      style: text.small.copyWith(
-                        color: colors.onSurface.withValues(alpha: 0.6),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        author.displayName,
+                        style: text.body.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
-                    ),
-                  ],
+                      Text(
+                        '@${author.username}',
+                        style: text.small.copyWith(
+                          color: colors.onSurface.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -66,9 +76,17 @@ class FeedCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Prompt', style: text.small.copyWith(fontWeight: FontWeight.w700)),
+                  Text(
+                    'Prompt',
+                    style: text.small.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                   const SizedBox(height: 6),
-                  Text(post.prompt, style: text.prompt),
+                  Text(
+                    post.prompt,
+                    style: text.prompt,
+                  ),
                 ],
               ),
             ),
@@ -82,7 +100,9 @@ class FeedCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: colors.secondary.withValues(alpha: 0.18),
                 borderRadius: BorderRadius.circular(22),
-                border: Border.all(color: colors.onSurface.withValues(alpha: 0.16)),
+                border: Border.all(
+                  color: colors.onSurface.withValues(alpha: 0.16),
+                ),
               ),
               child: Icon(
                 Icons.photo_camera_outlined,
@@ -93,7 +113,10 @@ class FeedCard extends StatelessWidget {
 
             const SizedBox(height: 14),
 
-            Text(post.caption, style: text.body),
+            Text(
+              post.caption,
+              style: text.body,
+            ),
 
             const SizedBox(height: 12),
 
@@ -109,10 +132,10 @@ class FeedCard extends StatelessWidget {
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: post.reactions.entries.map((entry) {
+              children: post.reactions.map((entry) {
                 return ReactionChip(
-                  reaction: entry.key,
-                  count: entry.value,
+                  reaction: entry.emoji,
+                  count: entry.count,
                 );
               }).toList(),
             ),
@@ -124,8 +147,18 @@ class FeedCard extends StatelessWidget {
 
   String _formatDate(DateTime date) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
 
     return '${months[date.month - 1]} ${date.day}, ${date.year}';

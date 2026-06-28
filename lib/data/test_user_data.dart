@@ -1,0 +1,36 @@
+import '../models/user_profile.dart';
+
+final Map<String, UserProfile> testUsers = {
+  'user_002': const UserProfile(
+    id: 'user_002',
+    username: 'mosswatcher',
+    displayName: 'Morgan',
+    pronouns: 'she/they',
+    bio: 'Quiet walks, rainy windows, and too much coffee.',
+    profileImagePath: 'assets/profiles/morgan.jpg',
+    cornerIds: ['nature', 'coffee'],
+    friendIds: ['user_001'],
+    followerIds: ['user_001', 'user_003'],
+    followingIds: ['user_001'],
+    enabledThemePackId: 'soft_moss',
+    unlockedThemePackIds: ['soft_moss'],
+    enabledPromptPackIds: ['mindful_moments'],
+    unlockedPromptPackIds: ['mindful_moments'],
+  ),
+  'user_003': const UserProfile(
+    id: 'user_003',
+    username: 'smalljoys',
+    displayName: 'Ash',
+    pronouns: null,
+    bio: 'Finding nice colours in ordinary places.',
+    profileImagePath: 'assets/profiles/ash.jpg',
+    cornerIds: ['cats'],
+    friendIds: ['user_001'],
+    followerIds: ['user_001'],
+    followingIds: ['user_001', 'user_002'],
+    enabledThemePackId: 'peach_calm',
+    unlockedThemePackIds: ['peach_calm'],
+    enabledPromptPackIds: ['mindful_moments'],
+    unlockedPromptPackIds: ['mindful_moments'],
+  ),
+};

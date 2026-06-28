@@ -2,20 +2,16 @@ import 'reaction.dart';
 
 class Post {
   final String id;
-  final String displayName;
-  final String username;
-  final String? profileImagePath;
+  final String authorId;
   final String prompt;
   final String caption;
   final String? imagePath;
   final DateTime createdAt;
-  final Map<Reaction, int> reactions;
+  final List<Reaction> reactions;
 
   const Post({
     required this.id,
-    required this.displayName,
-    required this.username,
-    this.profileImagePath,
+    required this.authorId,
     required this.prompt,
     required this.caption,
     this.imagePath,

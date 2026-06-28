@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import '../theme/text_styles.dart';
+
 import '../config/app_config.dart';
+import '../theme/text_styles.dart';
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
@@ -12,10 +15,10 @@ class CameraScreen extends StatefulWidget {
 
 class _CameraScreenState extends State<CameraScreen> {
   final ImagePicker _picker = ImagePicker();
-
-// Today's Prompt: <prompt.next?>
+  final TextEditingController _captionController = TextEditingController();
 
   XFile? _selectedImage;
+
   Future<void> _openCamera() async {
     final image = await _picker.pickImage(
       source: ImageSource.camera,
@@ -27,7 +30,39 @@ class _CameraScreenState extends State<CameraScreen> {
 
     setState(() {
       _selectedImage = image;
+      _captionController.clear();
     });
+  }
+
+  void _confirmGlimmer() {
+    final caption = _captionController.text.trim();
+
+    // For now, just prove the flow works.
+    // Later, this will save to local DB.
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          caption.isEmpty
+              ? 'glimmer saved without a caption'
+              : 'glimmer saved: $caption',
+        ),
+      ),
+    );
+  }
+
+  void _retakePhoto() {
+    setState(() {
+      _selectedImage = null;
+      _captionController.clear();
+    });
+
+    _openCamera();
+  }
+
+  @override
+  void dispose() {
+    _captionController.dispose();
+    super.dispose();
   }
 
   @override
@@ -40,12 +75,12 @@ class _CameraScreenState extends State<CameraScreen> {
       appBar: AppBar(
         title: Text('capture', style: text.quicksandHeading),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 100),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Capture a glimmer', style: text.quicksandHeading),
+            Text('capture a glimmer', style: text.quicksandHeading),
             const SizedBox(height: 8),
             Text(
               prompt.text,
@@ -55,21 +90,64 @@ class _CameraScreenState extends State<CameraScreen> {
             ),
             const SizedBox(height: 24),
 
-            Center(
-              child: ElevatedButton.icon(
-                onPressed: _openCamera,
-                icon: const Icon(Icons.camera_alt_outlined),
-                label: const Text('open camera'),
+            if (_selectedImage == null) ...[
+              Center(
+                child: ElevatedButton.icon(
+                  onPressed: _openCamera,
+                  icon: const Icon(Icons.camera_alt_outlined),
+                  label: const Text('open camera'),
+                ),
               ),
-            ),
-
-            const SizedBox(height: 24),
-
-            if (_selectedImage != null)
-              Text(
-                'photo selected: ${_selectedImage!.name}',
-                style: text.quicksandSmall,
+            ] else ...[
+              ClipRRect(
+                borderRadius: BorderRadius.circular(28),
+                child: Image.file(
+                  File(_selectedImage!.path),
+                  width: double.infinity,
+                  height: 360,
+                  fit: BoxFit.cover,
+                ),
               ),
+
+              const SizedBox(height: 20),
+
+              TextField(
+                controller: _captionController,
+                maxLines: 3,
+                textInputAction: TextInputAction.done,
+                decoration: InputDecoration(
+                  hintText: 'add a caption...',
+                  filled: true,
+                  fillColor: colors.surface,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 18),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _retakePhoto,
+                      icon: const Icon(Icons.camera_alt_outlined),
+                      label: const Text('retake'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: _confirmGlimmer,
+                      icon: const Icon(Icons.check),
+                      label: const Text('confirm'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ],
         ),
       ),

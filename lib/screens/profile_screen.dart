@@ -1,113 +1,192 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../data/test_data.dart';
 import '../data/test_feed_data.dart';
+import '../state/profile_store.dart';
 import '../theme/text_styles.dart';
 import '../widgets/feed_card.dart';
+import '../widgets/profile_avatar.dart';
 import '../widgets/profile_stat.dart';
-import '../data/test_data.dart';
+import 'edit_profile_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+class ProfileScreen extends ConsumerWidget {
+  final String userId;
+  final isCurrentUser = profile.id == loggedIn_user_id;
+
+  const ProfileScreen({
+    super.key,
+    required this.userId,
+  });
 
   @override
-  Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    final colors = Theme.of(context).colorScheme;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profile = ref.watch(userByIdProvider(userId));
 
-    final favoritePosts = testFeedPosts.take(2).toList();
+    if (profile == null) {
+      return const Scaffold(
+        body: Center(
+          child: Text('Profile not found'),
+        ),
+      );
+    }
+    final hasPronouns =
+        profile.pronouns != null && profile.pronouns!.trim().isNotEmpty;
 
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              height: 52,
-              color: colors.secondary,
-              padding: const EdgeInsets.symmetric(horizontal: 18),
-              child: Row(
-                children: [
-                  Icon(Icons.arrow_back, color: colors.onSecondary),
-                  const Spacer(),
-                  Text(
-                    '@codie',
-                    style: text.bodyMedium?.copyWith(
-                      color: colors.onSecondary,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
+      
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Text(
+          '@${profile.username}',
+          style: Theme.of(context).textTheme.quicksandHeading.copyWith(
+            fontSize: 20,
+          ),
+        ),
+        actions: [
+          IconButton(
+            tooltip: 'Edit profile',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const EditProfileScreen(),
+                ),
+              );
+            },
+            icon: const Icon(Icons.edit_outlined),
+          ),
+          IconButton(
+            tooltip: 'Settings',
+            onPressed: () {
+              // Open settings later
+            },
+            icon: const Icon(Icons.settings_outlined),
+          ),
+          const SizedBox(width: 6),
+        ],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 100),
+        children: [
+          // Profile identity
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              ProfileAvatar(
+                imagePath: profile.profileImagePath,
+                radius: 46,
               ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(24, 20, 24, 90),
+              const SizedBox(width: 18),
+              Expanded(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('codie ✦', style: text.heading),
-                    Text(
-                      '(they/them)',
-                      style: text.body.copyWith(
-                        color: colors.onSurface.withValues(alpha: 0.65),
-                      ),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            profile.displayName,
+                            style: Theme.of(context).textTheme.quicksandHeading.copyWith(
+                              fontSize: 23,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 5),
+                        const Text(
+                          '✦',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 20),
-                    CircleAvatar(
-                      radius: 58,
-                      backgroundColor: Colors.transparent,
-                      child: Icon(
-                        Icons.account_circle_outlined,
-                        size: 125,
-                        color: colors.onSurface,
+                    if (hasPronouns) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        profile.pronouns!,
+                        style: Theme.of(context).textTheme.quicksandBody.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.58),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
+                    ],
+                    const SizedBox(height: 8),
                     Text(
                       '${sampleMemories.length} glimmers snapped',
-                      style: text.heading.copyWith(
-                        fontSize: 18,
+                      style: Theme.of(context).textTheme.quicksandSmall.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'bio here im a dev\nhehehehehe',
-                      textAlign: TextAlign.center,
-                      style: text.body.copyWith(
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    const Row(
-                      children: [
-                        ProfileStat(value: '193', label: 'friends'),
-                        ProfileStat(value: '227', label: 'following'),
-                        ProfileStat(value: '472', label: 'followers'),
-                        ProfileStat(value: '12', label: 'corners'),
-                      ],
-                    ),
-                    const SizedBox(height: 36),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'favorite glimmers',
-                        style: text.heading.copyWith(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    ...favoritePosts.map((post) {
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 18),
-                        child: FeedCard(post: post),
-                      );
-                    }),
                   ],
                 ),
               ),
+            ],
+          ),
+
+          const SizedBox(height: 18),
+
+          // Bio
+          if (profile.bio?.trim().isNotEmpty == true)
+            Text(
+              profile.bio!.trim(),
+              style: text.quicksandBody.copyWith(
+                height: 1.35,
+              ),
             ),
-          ],
-        ),
+
+          const SizedBox(height: 20),
+
+          // Social statistics
+          Row(
+            children: [
+              ProfileStat(
+                value: profile.friendIds.length.toString(),
+                label: 'friends',
+              ),
+              ProfileStat(
+                value: profile.followingIds.length.toString(),
+                label: 'following',
+              ),
+              ProfileStat(
+                value: profile.followerIds.length.toString(),
+                label: 'followers',
+              ),
+              ProfileStat(
+                value: profile.cornerIds.length.toString(),
+                label: 'corners',
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 28),
+
+          Row(
+            children: [
+              Text(
+                'favorite glimmers',
+                style: Theme.of(context).textTheme.quicksandHeading.copyWith(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const Spacer(),
+              TextButton(
+                onPressed: () {},
+                child: const Text('see all'),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 10),
+
+          ...favoritePosts.map(
+            (post) => Padding(
+              padding: const EdgeInsets.only(bottom: 18),
+              child: FeedCard(post: post),
+            ),
+          ),
+        ],
       ),
     );
   }
