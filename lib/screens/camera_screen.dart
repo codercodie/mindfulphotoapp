@@ -12,7 +12,6 @@ import '../models/reaction.dart';
 import '../state/post_store.dart';
 import '../state/profile_store.dart';
 import '../theme/text_styles.dart';
-import 'package:intl/intl.dart';
 
 class CameraScreen extends ConsumerStatefulWidget {
   final VoidCallback? onGlimmerSaved;
@@ -28,6 +27,38 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
   final TextEditingController _captionController = TextEditingController();
 
   XFile? _selectedImage;
+
+  String formatFriendlyDate(DateTime date) {
+    const weekdays = [
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+      'sunday',
+    ];
+
+    const months = [
+      'january',
+      'february',
+      'march',
+      'april',
+      'may',
+      'june',
+      'july',
+      'august',
+      'september',
+      'october',
+      'november',
+      'december',
+    ];
+
+    return '${weekdays[date.weekday - 1]} '
+        '${date.day} '
+        '${months[date.month - 1]} '
+        '${date.year}';
+  }
 
   Future<void> _pickImage(ImageSource source) async {
     final image = await _picker.pickImage(
@@ -187,13 +218,6 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
     super.dispose();
   }
 
-    String _dateGetter() {
-      String dateString = "May 20, 2024";
-      DateFormat format = DateFormat("MMM dd, yyyy");
-      DateTime dateTime = format.parse(dateString);
-      return dateTime.toString();
-    }
-
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
@@ -201,7 +225,12 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
     final prompt = defaultPack.prompts.first;
 
     return Scaffold(
-      appBar: AppBar(title: Text(_dateGetter(), style: text.quicksandHeading)),
+      appBar: AppBar(
+        title: Text(
+          formatFriendlyDate(DateTime.now()),
+          style: text.quicksandHeading,
+        ),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
         child: Column(

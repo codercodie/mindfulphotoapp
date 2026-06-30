@@ -11,6 +11,7 @@ import '../theme/text_styles.dart';
 import '../widgets/feed_card.dart';
 import '../widgets/profile_avatar.dart';
 import 'profile_screen.dart';
+import 'interest_selection_screen.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -29,38 +30,54 @@ class HomeScreen extends ConsumerWidget {
           currentUser.followingIds.contains(post.authorId);
     }).toList();
 
-    final suggestedUsers =
-        userDirectory.values.where((user) => user.id != currentUser.id).toList()
-          ..sort((first, second) {
-            final firstShared = _sharedInterestCount(currentUser, first);
+    final suggestedUsers = userDirectory.values
+        .where((user) => user.id != currentUser.id)
+        .where(
+          (user) =>
+              _sharedInterestCount(currentUser, user) > 0,
+        )
+        .toList()
+      ..sort((first, second) {
+        final firstShared = _sharedInterestCount(
+          currentUser,
+          first,
+        );
 
-            final secondShared = _sharedInterestCount(currentUser, second);
+        final secondShared = _sharedInterestCount(
+          currentUser,
+          second,
+        );
 
-            return secondShared.compareTo(firstShared);
-          });
+        return secondShared.compareTo(firstShared);
+      });
 
     return DefaultTabController(
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          bottom: TabBar(
-            indicatorColor: colors.primary,
-            indicatorWeight: 3,
-            indicatorSize: TabBarIndicatorSize.tab,
-            dividerColor: colors.onSurface.withValues(alpha: 0.08),
-            labelColor: colors.onSurface,
-            unselectedLabelColor: colors.onSurface.withValues(alpha: 0.55),
-            labelStyle: text.quicksandSmall.copyWith(
-              fontWeight: FontWeight.w700,
-              fontSize: 15,
-            ),
-            unselectedLabelStyle: text.quicksandSmall,
-            tabs: const [
-              Tab(text: 'home'),
-              Tab(text: 'discover'),
-            ],
+        automaticallyImplyLeading: false,
+        toolbarHeight: 5,
+        scrolledUnderElevation: 0,
+        bottom: TabBar(
+          indicatorColor: colors.primary,
+          indicatorWeight: 3,
+          indicatorSize: TabBarIndicatorSize.tab,
+          dividerColor: colors.onSurface.withValues(alpha: 0.08),
+          labelColor: colors.onSurface,
+          unselectedLabelColor: colors.onSurface.withValues(alpha: 0.55),
+          labelStyle: text.quicksandSmall.copyWith(
+            fontWeight: FontWeight.w700,
+            fontSize: 15,
           ),
+          unselectedLabelStyle: text.quicksandSmall.copyWith(
+            fontSize: 15,
+          ),
+          tabs: const [
+            Tab(text: 'home'),
+            Tab(text: 'discover'),
+          ],
         ),
+      ),
         body: TabBarView(
           children: [
             _FollowingTab(posts: followingPosts),
@@ -109,11 +126,12 @@ class _FollowingTab extends StatelessWidget {
 class _DiscoverTab extends StatelessWidget {
   final UserProfile currentUser;
   final List<UserProfile> users;
-
   const _DiscoverTab({required this.currentUser, required this.users});
+  
 
   @override
   Widget build(BuildContext context) {
+    
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 18, 16, 100),
       children: [
@@ -128,7 +146,46 @@ class _DiscoverTab extends StatelessWidget {
           'based on the interests you share.',
           style: Theme.of(context).textTheme.quicksandSmall,
         ),
+        
         const SizedBox(height: 16),
+        if (users.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 28,
+              vertical: 80,
+            ),
+            child: Column(
+              children: [
+                const Icon(
+                  Icons.interests_outlined,
+                  size: 48,
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'no matches yet',
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'try adding a few more interests to find people with things in common.',
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            const InterestSelectionScreen(),
+                      ),
+                    );
+                  },
+                  child: const Text('edit interests'),
+                ),
+              ],
+            ),
+          )
+        else
         ...users.map((user) {
           final sharedInterestIds = user.interestIds
               .where(currentUser.interestIds.contains)

@@ -2,15 +2,18 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+
+import '../models/user_profile.dart';
 import '../state/profile_store.dart';
+import '../state/user_directory.dart';
 import '../theme/text_styles.dart';
-import '../widgets/profile_avatar.dart';
-import 'package:image_cropper/image_cropper.dart';
-import 'interest_selection_screen.dart';
 import '../widgets/interest_list.dart';
+import '../widgets/profile_avatar.dart';
+import 'interest_selection_screen.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
@@ -36,14 +39,23 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final profile = ref.read(profileStoreProvider);
 
     _profileImagePath = profile.profileImagePath;
-
     _displayNameController = TextEditingController(text: profile.displayName);
-
     _usernameController = TextEditingController(text: profile.username);
-
     _pronounsController = TextEditingController(text: profile.pronouns ?? '');
-
     _bioController = TextEditingController(text: profile.bio);
+  }
+
+  bool _isUsernameTaken({
+    required String username,
+    required String currentUserId,
+    required Map<String, UserProfile> users,
+  }) {
+    final normalizedUsername = username.trim().toLowerCase();
+
+    return users.values.any((user) {
+      return user.id != currentUserId &&
+          user.username.trim().toLowerCase() == normalizedUsername;
+    });
   }
 
   Future<void> _changeProfilePhoto() async {
@@ -91,7 +103,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         : path.extension(croppedImage.path);
 
     final savedImage = await File(croppedImage.path).copy(
-      '${directory.path}/profile_${DateTime.now().millisecondsSinceEpoch}$extension',
+      path.join(
+        directory.path,
+        'profile_${DateTime.now().millisecondsSinceEpoch}$extension',
+      ),
     );
 
     if (!mounted) {
@@ -104,6 +119,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   void _saveProfile() {
+    final profile = ref.read(profileStoreProvider);
+    final users = ref.read(userDirectoryProvider);
+
     final displayName = _displayNameController.text.trim();
     final username = _usernameController.text.trim();
     final pronouns = _pronounsController.text.trim();
@@ -112,8 +130,21 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     if (displayName.isEmpty || username.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Display name and username are required.'),
+          content: Text('display name and username are required.'),
         ),
+      );
+      return;
+    }
+
+    final usernameTaken = _isUsernameTaken(
+      username: username,
+      currentUserId: profile.id,
+      users: users,
+    );
+
+    if (usernameTaken) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('that username is already taken')),
       );
       return;
     }
@@ -175,11 +206,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               prefixText: '@',
             ),
             const SizedBox(height: 16),
-            _ProfileField(
-              label: 'pronouns',
-              controller: _pronounsController,
-              hintText: 'optional',
-            ),
+            _ProfileField(label: 'pronouns', controller: _pronounsController),
             const SizedBox(height: 16),
             _ProfileField(
               label: 'bio',
@@ -210,15 +237,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 ),
               ],
             ),
-
             const SizedBox(height: 8),
-
             InterestList(
               interestIds: profile.interestIds,
-              emptyText: 'choose some interests to help people find you',
+              emptyText: 'what are you interested in?',
+              alignment: WrapAlignment.center,
             ),
-
-            const SizedBox(height: 28),
             const SizedBox(height: 28),
             ElevatedButton(
               onPressed: _saveProfile,
@@ -234,14 +258,12 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 class _ProfileField extends StatelessWidget {
   final String label;
   final TextEditingController controller;
-  final String? hintText;
   final String? prefixText;
   final int maxLines;
 
   const _ProfileField({
     required this.label,
     required this.controller,
-    this.hintText,
     this.prefixText,
     this.maxLines = 1,
   });
@@ -266,7 +288,6 @@ class _ProfileField extends StatelessWidget {
           controller: controller,
           maxLines: maxLines,
           decoration: InputDecoration(
-            hintText: hintText,
             prefixText: prefixText,
             filled: true,
             fillColor: colors.surface,

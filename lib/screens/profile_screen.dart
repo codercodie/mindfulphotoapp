@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../state/post_store.dart';
 import '../state/profile_store.dart';
 import '../state/user_directory.dart';
 import '../theme/text_styles.dart';
 import '../widgets/feed_card.dart';
+import '../widgets/interest_list.dart';
 import '../widgets/profile_avatar.dart';
 import '../widgets/profile_stat.dart';
 import 'edit_profile_screen.dart';
 import 'settings_screen.dart';
-import '../widgets/interest_list.dart';
 
 class ProfileScreen extends ConsumerWidget {
   final String? userId;
@@ -26,29 +27,32 @@ class ProfileScreen extends ConsumerWidget {
     final profile = ref.watch(userByIdProvider(targetUserId));
 
     if (profile == null) {
-      return const Scaffold(body: Center(child: Text('Profile not found')));
+      return const Scaffold(body: Center(child: Text('profile not found')));
     }
 
     final isCurrentUser = profile.id == currentUser.id;
-
     final profilePosts = ref.watch(postsByUserProvider(profile.id));
 
     final hasPronouns =
         profile.pronouns != null && profile.pronouns!.trim().isNotEmpty;
-
-    final hasBio = profile.bio != null && profile.bio!.trim().isNotEmpty;
+    final hasBio = profile.bio!.trim().isNotEmpty;
+    final glimmerCount = profilePosts.length;
+    final glimmerLabel = glimmerCount == 1 ? 'glimmer' : 'glimmers';
 
     return Scaffold(
       appBar: AppBar(
-        automaticallyImplyLeading: userId == null,
+        automaticallyImplyLeading: userId != null,
         title: Text(
           '@${profile.username}',
-          style: text.quicksandHeading.copyWith(fontSize: 20),
+          style: text.quicksandHeading.copyWith(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         actions: [
           if (isCurrentUser) ...[
             IconButton(
-              tooltip: 'Edit profile',
+              tooltip: 'edit profile',
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const EditProfileScreen()),
@@ -57,7 +61,7 @@ class ProfileScreen extends ConsumerWidget {
               icon: const Icon(Icons.edit_outlined),
             ),
             IconButton(
-              tooltip: 'Settings',
+              tooltip: 'settings',
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (_) => const SettingsScreen()),
@@ -67,8 +71,10 @@ class ProfileScreen extends ConsumerWidget {
             ),
           ] else
             IconButton(
-              tooltip: 'Follow',
-              onPressed: () {},
+              tooltip: 'follow',
+              onPressed: () {
+                // Add follow/unfollow behaviour later.
+              },
               icon: const Icon(Icons.person_add_outlined),
             ),
           const SizedBox(width: 6),
@@ -91,11 +97,11 @@ class ProfileScreen extends ConsumerWidget {
                         Flexible(
                           child: Text(
                             profile.displayName,
+                            overflow: TextOverflow.ellipsis,
                             style: text.quicksandHeading.copyWith(
                               fontSize: 23,
                               fontWeight: FontWeight.w600,
                             ),
-                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         const SizedBox(width: 5),
@@ -106,15 +112,17 @@ class ProfileScreen extends ConsumerWidget {
                       const SizedBox(height: 2),
                       Text(
                         profile.pronouns!,
-                        style: text.quicksandBody.copyWith(
+                        style: text.quicksandSmall.copyWith(
+                          fontSize: 13,
                           color: colors.onSurface.withValues(alpha: 0.58),
                         ),
                       ),
                     ],
                     const SizedBox(height: 8),
                     Text(
-                      '${profilePosts.length} glimmers',
+                      '$glimmerCount $glimmerLabel',
                       style: text.quicksandSmall.copyWith(
+                        fontSize: 13,
                         color: colors.primary,
                         fontWeight: FontWeight.w600,
                       ),
@@ -124,64 +132,49 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ],
           ),
+
           if (hasBio) ...[
             const SizedBox(height: 18),
             Text(
               profile.bio!.trim(),
-              style: text.quicksandBody.copyWith(height: 1.35),
+              style: text.quicksandBody.copyWith(fontSize: 15, height: 1.35),
             ),
           ],
-          if (profile.interestIds.isNotEmpty) ...[
-            const SizedBox(height: 18),
 
-            Row(
-              children: [
-                Text(
-                  'interests',
-                  style: text.quicksandHeading.copyWith(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const Spacer(),
-                if (profile.interestIds.length > 6)
-                  TextButton(
-                    onPressed: () {
-                      showModalBottomSheet<void>(
-                        context: context,
-                        showDragHandle: true,
-                        useSafeArea: true,
-                        builder: (sheetContext) {
-                          return Padding(
-                            padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'interests',
-                                  style: text.quicksandHeading.copyWith(
-                                    fontSize: 20,
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                InterestList(interestIds: profile.interestIds),
-                              ],
-                            ),
+          if (profile.interestIds.isNotEmpty) ...[
+            const SizedBox(height: 20),
+            SizedBox(
+              height: 42,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  if (profile.interestIds.length > 5)
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {
+                          _showAllInterests(
+                            context,
+                            profile.displayName,
+                            profile.interestIds,
                           );
                         },
-                      );
-                    },
-                    child: const Text('see all'),
-                  ),
-              ],
+                        child: const Text('see all'),
+                      ),
+                    ),
+                ],
+              ),
             ),
-
             const SizedBox(height: 8),
-
-            InterestList(interestIds: profile.interestIds, maxItems: 6),
+            InterestList(
+              interestIds: profile.interestIds,
+              maxItems: 6,
+              alignment: WrapAlignment.center,
+            ),
           ],
-          const SizedBox(height: 20),
+
+          const SizedBox(height: 22),
+
           Row(
             children: [
               ProfileStat(
@@ -196,33 +189,23 @@ class ProfileScreen extends ConsumerWidget {
                 value: profile.followerIds.length.toString(),
                 label: 'followers',
               ),
-              // ProfileStat(
-              //   value: profile.cornerIds.length.toString(),
-              //   label: 'corners',
-              // ),
             ],
           ),
+
           const SizedBox(height: 28),
-          Row(
-            children: [
-              Text(
-                'glimmers',
-                style: text.quicksandHeading.copyWith(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const Spacer(),
-            ],
-          ),
           const SizedBox(height: 10),
+
           if (profilePosts.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 24),
-              child: Text(
-                "No glimmers yet :'(",
-                style: text.quicksandBody.copyWith(
-                  color: colors.onSurface.withValues(alpha: 0.6),
+              child: Center(
+                child: Text(
+                  'no glimmers yet :(',
+                  textAlign: TextAlign.center,
+                  style: text.quicksandBody.copyWith(
+                    fontSize: 15,
+                    color: colors.onSurface.withValues(alpha: 0.6),
+                  ),
                 ),
               ),
             )
@@ -235,6 +218,51 @@ class ProfileScreen extends ConsumerWidget {
             ),
         ],
       ),
+    );
+  }
+
+  void _showAllInterests(
+    BuildContext context,
+    String displayName,
+    List<String> interestIds,
+  ) {
+    final text = Theme.of(context).textTheme;
+
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      useSafeArea: true,
+      isScrollControlled: true,
+      builder: (sheetContext) {
+        return FractionallySizedBox(
+          heightFactor: 0.55,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  '$displayName’s interests',
+                  textAlign: TextAlign.center,
+                  style: text.quicksandHeading.copyWith(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: InterestList(
+                      interestIds: interestIds,
+                      alignment: WrapAlignment.center,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

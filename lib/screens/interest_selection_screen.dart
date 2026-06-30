@@ -16,7 +16,7 @@ class InterestSelectionScreen extends ConsumerStatefulWidget {
 class _InterestSelectionScreenState
     extends ConsumerState<InterestSelectionScreen> {
   static const int minimumInterests = 3;
-  static const int maximumInterests = 10;
+  static const int maximumInterests = 15;
 
   late final Set<String> _selectedInterestIds;
 

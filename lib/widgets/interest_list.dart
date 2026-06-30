@@ -6,12 +6,14 @@ class InterestList extends StatelessWidget {
   final List<String> interestIds;
   final int? maxItems;
   final String emptyText;
+  final WrapAlignment alignment;
 
   const InterestList({
     super.key,
     required this.interestIds,
     this.maxItems,
     this.emptyText = 'no interests selected',
+    this.alignment = WrapAlignment.start,
   });
 
   @override
@@ -24,9 +26,12 @@ class InterestList extends StatelessWidget {
         .toList();
 
     if (interests.isEmpty) {
-      return Text(
-        emptyText,
-        style: TextStyle(color: colors.onSurface.withValues(alpha: 0.55)),
+      return Center(
+        child: Text(
+          emptyText,
+          textAlign: TextAlign.center,
+          style: TextStyle(color: colors.onSurface.withValues(alpha: 0.55)),
+        ),
       );
     }
 
@@ -35,6 +40,7 @@ class InterestList extends StatelessWidget {
         : interests.take(maxItems!).toList();
 
     return Wrap(
+      alignment: alignment,
       spacing: 7,
       runSpacing: 7,
       children: visibleInterests.map((interest) {

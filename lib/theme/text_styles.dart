@@ -41,3 +41,20 @@ extension TextStyles on TextTheme {
     height: 1.1,
   );
 }
+
+extension ProfileTextStyles on TextTheme {
+  TextStyle get profileName =>
+      quicksandHeading.copyWith(fontSize: 23, fontWeight: FontWeight.w600);
+
+  TextStyle get profileSection =>
+      quicksandHeading.copyWith(fontSize: 20, fontWeight: FontWeight.w600);
+
+  TextStyle get profileBody => quicksandBody.copyWith(
+    fontSize: 15,
+    fontWeight: FontWeight.w400,
+    height: 1.35,
+  );
+
+  TextStyle get profileMeta =>
+      quicksandSmall.copyWith(fontSize: 13, fontWeight: FontWeight.w400);
+}
