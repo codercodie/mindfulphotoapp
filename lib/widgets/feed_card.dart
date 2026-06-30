@@ -16,10 +16,31 @@ class FeedCard extends ConsumerWidget {
   final Post post;
   final VoidCallback? onAuthorTap;
 
+  void _showReactionLimitBar(BuildContext context) {
+    final messenger = ScaffoldMessenger.of(context);
+
+    messenger.clearSnackBars();
+
+    messenger.showSnackBar(
+      const SnackBar(
+        content: Text('you can select up to five reactions.'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
   const FeedCard({super.key, required this.post, this.onAuthorTap});
 
   Future<void> _showReactionPicker(BuildContext context, WidgetRef ref) async {
     final selectedReactions = Set<Reaction>.from(post.currentUserReactions);
+
+    bool isLimitDialogOpen = false;
+
+    void saveSelections() {
+      ref
+          .read(postStoreProvider.notifier)
+          .setUserReactions(post.id, Set<Reaction>.from(selectedReactions));
+    }
 
     final result = await showModalBottomSheet<Set<Reaction>>(
       context: context,
@@ -32,137 +53,187 @@ class FeedCard extends ConsumerWidget {
             final text = Theme.of(context).textTheme;
             final colors = Theme.of(context).colorScheme;
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+            return SizedBox(
+              height: MediaQuery.sizeOf(context).height * 0.9,
               child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          'choose reactions',
-                          style: text.quicksandHeading.copyWith(fontSize: 20),
-                        ),
-                      ),
-                      Text(
-                        '${selectedReactions.length}/5',
-                        style: text.quicksandSmall.copyWith(
-                          color: colors.onSurface.withValues(alpha: 0.6),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 6),
-
-                  Text(
-                    'select up to five reactions.',
-                    style: text.quicksandSmall.copyWith(
-                      color: colors.onSurface.withValues(alpha: 0.6),
-                    ),
-                  ),
-
-                  const SizedBox(height: 18),
-
-                  Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: Reaction.values.map((reaction) {
-                      final isSelected = selectedReactions.contains(reaction);
-
-                      return InkWell(
-                        onTap: () {
-                          if (isSelected) {
-                            setSheetState(() {
-                              selectedReactions.remove(reaction);
-                            });
-
-                            return;
-                          }
-
-                          if (selectedReactions.length >= 5) {
-                            ScaffoldMessenger.of(sheetContext).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'you can select up to five reactions.',
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  'choose reactions',
+                                  style: text.quicksandHeading.copyWith(
+                                    fontSize: 20,
+                                  ),
                                 ),
                               ),
-                            );
-
-                            return;
-                          }
-
-                          setSheetState(() {
-                            selectedReactions.add(reaction);
-                          });
-                        },
-                        borderRadius: BorderRadius.circular(18),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 150),
-                          width: 92,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isSelected
-                                ? colors.primary.withValues(alpha: 0.16)
-                                : colors.surface,
-                            borderRadius: BorderRadius.circular(18),
-                            border: Border.all(
-                              color: isSelected
-                                  ? colors.primary
-                                  : colors.onSurface.withValues(alpha: 0.12),
-                            ),
-                          ),
-                          child: Column(
-                            children: [
                               Text(
-                                reaction.emoji,
-                                style: const TextStyle(fontSize: 28),
-                              ),
-                              const SizedBox(height: 5),
-                              Text(
-                                reaction.label,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(fontSize: 11),
+                                '${selectedReactions.length}/5',
+                                style: text.quicksandSmall.copyWith(
+                                  color: colors.onSurface.withValues(
+                                    alpha: 0.6,
+                                  ),
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ],
                           ),
-                        ),
-                      );
-                    }).toList(),
+                          const SizedBox(height: 6),
+                          Text(
+                            'select up to five reactions.',
+                            style: text.quicksandSmall.copyWith(
+                              color: colors.onSurface.withValues(alpha: 0.6),
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          Wrap(
+                            spacing: 10,
+                            runSpacing: 10,
+                            children: Reaction.values.map((reaction) {
+                              final isSelected = selectedReactions.contains(
+                                reaction,
+                              );
+
+                              return InkWell(
+                                onTap: () async {
+                                  if (isSelected) {
+                                    setSheetState(() {
+                                      selectedReactions.remove(reaction);
+                                    });
+
+                                    saveSelections();
+                                    return;
+                                  }
+
+                                  if (selectedReactions.length >= 5) {
+                                    if (isLimitDialogOpen) {
+                                      return;
+                                    }
+
+                                    isLimitDialogOpen = true;
+
+                                    await showDialog<void>(
+                                      context: sheetContext,
+                                      builder: (dialogContext) {
+                                        return AlertDialog(
+                                          title: const Text('reaction limit'),
+                                          content: const Text(
+                                            'you can select up to five reactions. '
+                                            'remove one before choosing another.',
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(
+                                                  dialogContext,
+                                                ).pop();
+                                              },
+                                              child: const Text('got it'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+
+                                    isLimitDialogOpen = false;
+                                    return;
+                                  }
+
+                                  setSheetState(() {
+                                    selectedReactions.add(reaction);
+                                  });
+
+                                  saveSelections();
+                                },
+                                borderRadius: BorderRadius.circular(18),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 150),
+                                  width: 92,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 12,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? colors.primary.withValues(alpha: 0.16)
+                                        : colors.surface,
+                                    borderRadius: BorderRadius.circular(18),
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? colors.primary
+                                          : colors.onSurface.withValues(
+                                              alpha: 0.12,
+                                            ),
+                                    ),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Text(
+                                        reaction.emoji,
+                                        style: const TextStyle(fontSize: 28),
+                                      ),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                        reaction.label,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(fontSize: 11),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
 
-                  const SizedBox(height: 20),
+                  // Fixed action row above Android navigation
+                  SafeArea(
+                    top: false,
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(20, 10, 20, 12),
+                      decoration: BoxDecoration(
+                        color: colors.surface,
+                        border: Border(
+                          top: BorderSide(
+                            color: colors.onSurface.withValues(alpha: 0.08),
+                          ),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          TextButton(
+                            onPressed: selectedReactions.isEmpty
+                                ? null
+                                : () {
+                                    setSheetState(() {
+                                      selectedReactions.clear();
+                                    });
 
-                  Row(
-                    children: [
-                      TextButton(
-                        onPressed: selectedReactions.isEmpty
-                            ? null
-                            : () {
-                                setSheetState(() {
-                                  selectedReactions.clear();
-                                });
-                              },
-                        child: const Text('clear'),
+                                    saveSelections();
+                                  },
+                            child: const Text('clear'),
+                          ),
+                          const Spacer(),
+                          ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(sheetContext).pop();
+                            },
+                            child: const Text('done'),
+                          ),
+                        ],
                       ),
-                      const Spacer(),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(
-                            sheetContext,
-                          ).pop(Set<Reaction>.from(selectedReactions));
-                        },
-                        child: const Text('done'),
-                      ),
-                    ],
+                    ),
                   ),
                 ],
               ),
@@ -296,13 +367,7 @@ class FeedCard extends ConsumerWidget {
                             selectedReactions.remove(entry.key);
                           } else {
                             if (selectedReactions.length >= 5) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'you can select up to five reactions.',
-                                  ),
-                                ),
-                              );
+                              _showReactionLimitBar(context);
                               return;
                             }
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'screens/home_screen.dart';
-import 'screens/corners_screen.dart';
+// import 'screens/corners_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/camera_screen.dart';
 import 'theme/build_theme.dart';
@@ -48,7 +48,7 @@ class _MainNavigationState extends State<MainNavigation> {
         },
       ),
       const HomeScreen(),
-      const CornersScreen(),
+      // const CornersScreen(),
       const ProfileScreen(),
     ];
     return Scaffold(
@@ -73,11 +73,11 @@ class _MainNavigationState extends State<MainNavigation> {
             selectedIcon: Icon(Icons.home),
             label: 'home',
           ),
-          NavigationDestination(
-            icon: Icon(Icons.group_outlined),
-            selectedIcon: Icon(Icons.group),
-            label: 'corners',
-          ),
+          // NavigationDestination(
+          //   icon: Icon(Icons.group_outlined),
+          //   selectedIcon: Icon(Icons.group),
+          //   label: 'corners',
+          // ),
           NavigationDestination(
             icon: Icon(Icons.person_outline),
             selectedIcon: Icon(Icons.person),

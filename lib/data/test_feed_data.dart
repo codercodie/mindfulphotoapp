@@ -24,6 +24,7 @@ final List<Post> testFeedPosts = [
       Reaction.zen: 10,
       Reaction.smile: 1,
       Reaction.fire: 3,
+      Reaction.awe: 6,
     },
   ),
   Post(
@@ -33,6 +34,11 @@ final List<Post> testFeedPosts = [
     caption: 'So bright and beautiful.',
     imagePath: 'assets/posts/flower.jpeg',
     createdAt: DateTime(2026, 6, 16),
-    reactions: {Reaction.wow: 4, Reaction.party: 9, Reaction.smile: 6},
+    reactions: {
+      Reaction.wow: 4,
+      Reaction.party: 9,
+      Reaction.smile: 6,
+      Reaction.beautiful: 2,
+    },
   ),
 ];

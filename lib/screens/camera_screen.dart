@@ -12,6 +12,7 @@ import '../models/reaction.dart';
 import '../state/post_store.dart';
 import '../state/profile_store.dart';
 import '../theme/text_styles.dart';
+import 'package:intl/intl.dart';
 
 class CameraScreen extends ConsumerStatefulWidget {
   final VoidCallback? onGlimmerSaved;
@@ -186,6 +187,13 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
     super.dispose();
   }
 
+    String _dateGetter() {
+      String dateString = "May 20, 2024";
+      DateFormat format = DateFormat("MMM dd, yyyy");
+      DateTime dateTime = format.parse(dateString);
+      return dateTime.toString();
+    }
+
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
@@ -193,7 +201,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
     final prompt = defaultPack.prompts.first;
 
     return Scaffold(
-      appBar: AppBar(title: Text('capture', style: text.quicksandHeading)),
+      appBar: AppBar(title: Text(_dateGetter(), style: text.quicksandHeading)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
         child: Column(

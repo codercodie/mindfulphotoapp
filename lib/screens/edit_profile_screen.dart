@@ -9,6 +9,8 @@ import '../state/profile_store.dart';
 import '../theme/text_styles.dart';
 import '../widgets/profile_avatar.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'interest_selection_screen.dart';
+import '../widgets/interest_list.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
@@ -141,6 +143,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
+    final profile = ref.watch(profileStoreProvider);
 
     return Scaffold(
       appBar: AppBar(title: Text('edit profile', style: text.quicksandHeading)),
@@ -183,6 +186,39 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               controller: _bioController,
               maxLines: 4,
             ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Text(
+                  'interests',
+                  style: text.quicksandHeading.copyWith(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const Spacer(),
+                TextButton.icon(
+                  onPressed: () async {
+                    await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => const InterestSelectionScreen(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.edit_outlined, size: 17),
+                  label: const Text('edit'),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 8),
+
+            InterestList(
+              interestIds: profile.interestIds,
+              emptyText: 'choose some interests to help people find you',
+            ),
+
+            const SizedBox(height: 28),
             const SizedBox(height: 28),
             ElevatedButton(
               onPressed: _saveProfile,

@@ -9,6 +9,7 @@ import '../widgets/profile_avatar.dart';
 import '../widgets/profile_stat.dart';
 import 'edit_profile_screen.dart';
 import 'settings_screen.dart';
+import '../widgets/interest_list.dart';
 
 class ProfileScreen extends ConsumerWidget {
   final String? userId;
@@ -112,7 +113,7 @@ class ProfileScreen extends ConsumerWidget {
                     ],
                     const SizedBox(height: 8),
                     Text(
-                      '${profilePosts.length} glimmers snapped',
+                      '${profilePosts.length} glimmers',
                       style: text.quicksandSmall.copyWith(
                         color: colors.primary,
                         fontWeight: FontWeight.w600,
@@ -130,6 +131,56 @@ class ProfileScreen extends ConsumerWidget {
               style: text.quicksandBody.copyWith(height: 1.35),
             ),
           ],
+          if (profile.interestIds.isNotEmpty) ...[
+            const SizedBox(height: 18),
+
+            Row(
+              children: [
+                Text(
+                  'interests',
+                  style: text.quicksandHeading.copyWith(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const Spacer(),
+                if (profile.interestIds.length > 6)
+                  TextButton(
+                    onPressed: () {
+                      showModalBottomSheet<void>(
+                        context: context,
+                        showDragHandle: true,
+                        useSafeArea: true,
+                        builder: (sheetContext) {
+                          return Padding(
+                            padding: const EdgeInsets.fromLTRB(20, 4, 20, 28),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'interests',
+                                  style: text.quicksandHeading.copyWith(
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                InterestList(interestIds: profile.interestIds),
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                    child: const Text('see all'),
+                  ),
+              ],
+            ),
+
+            const SizedBox(height: 8),
+
+            InterestList(interestIds: profile.interestIds, maxItems: 6),
+          ],
           const SizedBox(height: 20),
           Row(
             children: [
@@ -145,10 +196,10 @@ class ProfileScreen extends ConsumerWidget {
                 value: profile.followerIds.length.toString(),
                 label: 'followers',
               ),
-              ProfileStat(
-                value: profile.cornerIds.length.toString(),
-                label: 'corners',
-              ),
+              // ProfileStat(
+              //   value: profile.cornerIds.length.toString(),
+              //   label: 'corners',
+              // ),
             ],
           ),
           const SizedBox(height: 28),

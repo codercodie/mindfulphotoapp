@@ -15,7 +15,8 @@ class ProfileStore extends Notifier<UserProfile> {
       pronouns: 'they/them',
       bio: 'bio here im a dev\nhehehehehe',
       profileImagePath: 'assets/defaults/default_profile_picture.jpg',
-      cornerIds: ['cats', 'nature'],
+      // cornerIds: ['cats', 'nature'],
+      interestIds: ['cats', 'coding', 'cozy spaces'],
       friendIds: ['user_002', 'user_003', 'user_004'],
       followerIds: ['user_002', 'user_003', 'user_004', 'user_005'],
       followingIds: ['user_002', 'user_006'],
@@ -33,6 +34,10 @@ class ProfileStore extends Notifier<UserProfile> {
     }
 
     state = state.copyWith(enabledThemePackId: themePackId);
+  }
+
+  void updateInterests(List<String> interestIds) {
+    state = state.copyWith(interestIds: List<String>.from(interestIds));
   }
 
   void setPromptPackEnabled(String promptPackId, bool enabled) {

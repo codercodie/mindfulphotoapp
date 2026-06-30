@@ -8,7 +8,9 @@ class UserProfile {
   final String? bio;
   final String profileImagePath;
 
-  final List<String> cornerIds;
+  final List<String> interestIds;
+
+  // final List<String> cornerIds;
   final List<String> friendIds;
   final List<String> followerIds;
   final List<String> followingIds;
@@ -25,8 +27,9 @@ class UserProfile {
     required this.displayName,
     this.pronouns,
     this.bio,
+    required this.interestIds,
     required this.profileImagePath,
-    required this.cornerIds,
+    // required this.cornerIds,
     required this.friendIds,
     required this.followerIds,
     required this.followingIds,
@@ -46,6 +49,7 @@ class UserProfile {
     List<String>? friendIds,
     List<String>? followerIds,
     List<String>? followingIds,
+    List<String>? interestIds,
     String? enabledThemePackId,
     List<String>? unlockedThemePackIds,
     List<String>? enabledPromptPackIds,
@@ -62,12 +66,13 @@ class UserProfile {
 
       bio: identical(bio, _notProvided) ? this.bio : bio as String?,
 
-      cornerIds: cornerIds ?? this.cornerIds,
+      // cornerIds: cornerIds ?? this.cornerIds,
       friendIds: friendIds ?? this.friendIds,
       followerIds: followerIds ?? this.followerIds,
       followingIds: followingIds ?? this.followingIds,
       profileImagePath: profileImagePath ?? this.profileImagePath,
       enabledThemePackId: enabledThemePackId ?? this.enabledThemePackId,
+      interestIds: interestIds ?? this.interestIds,
       unlockedThemePackIds: unlockedThemePackIds ?? this.unlockedThemePackIds,
       enabledPromptPackIds: enabledPromptPackIds ?? this.enabledPromptPackIds,
       unlockedPromptPackIds:
