@@ -11,6 +11,8 @@ import 'post_image.dart';
 import '../models/reaction.dart';
 import '../state/post_store.dart';
 import '../state/app_settings_store.dart';
+import '../state/profile_store.dart';
+import 'post_options_button.dart';
 
 class FeedCard extends ConsumerWidget {
   final Post post;
@@ -258,6 +260,7 @@ class FeedCard extends ConsumerWidget {
       appSettingsProvider.select((settings) => settings.showReactionCounts),
     );
     final author = ref.watch(userByIdProvider(post.authorId));
+    final currentUser = ref.watch(profileStoreProvider);
 
     if (author == null) {
       return const SizedBox.shrink();
@@ -301,6 +304,12 @@ class FeedCard extends ConsumerWidget {
                           ),
                         ],
                       ),
+                    ),
+                    PostOptionsButton(
+                      postId: post.id,
+                      authorId: author.id,
+                      authorUsername: author.username,
+                      isOwnPost: author.id == currentUser.id,
                     ),
                   ],
                 ),
@@ -414,18 +423,18 @@ class FeedCard extends ConsumerWidget {
 
   String _formatDate(DateTime date) {
     const months = [
-      'jan',
-      'feb',
-      'mar',
-      'apr',
-      'may',
-      'jun',
-      'jul',
-      'aug',
-      'sep',
-      'oct',
-      'nov',
-      'dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
 
     return '${months[date.month - 1]} ${date.day}, ${date.year}';

@@ -28,7 +28,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
 
   XFile? _selectedImage;
 
-  String formatFriendlyDate(DateTime date) {
+  String _formatFriendlyDate(DateTime date) {
     const weekdays = [
       'monday',
       'tuesday',
@@ -223,93 +223,237 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
     final text = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
     final prompt = defaultPack.prompts.first;
+    final hasSelectedImage = _selectedImage != null;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          formatFriendlyDate(DateTime.now()),
-          style: text.quicksandHeading,
-        ),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "capture a glimmer inspired by today's prompt:",
-              style: text.quicksandHeading,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              prompt.text,
-              style: text.quicksandBody.copyWith(
-                color: colors.onSurface.withValues(alpha: 0.65),
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            if (_selectedImage == null) ...[
-              Center(
-                child: ElevatedButton.icon(
-                  onPressed: _showImageSourcePicker,
-                  icon: const Icon(Icons.add_a_photo_outlined),
-                  label: const Text('add photo'),
-                ),
-              ),
-            ] else ...[
-              ClipRRect(
-                borderRadius: BorderRadius.circular(28),
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: Image.file(
-                    File(_selectedImage!.path),
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              TextField(
-                controller: _captionController,
-                maxLines: 3,
-                textInputAction: TextInputAction.done,
-                decoration: InputDecoration(
-                  hintText: 'add a caption...',
-                  filled: true,
-                  fillColor: colors.surface,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(24),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 18),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: TextButton.icon(
-                      onPressed: _showImageSourcePicker,
-                      icon: const Icon(Icons.swap_horiz),
-                      label: const Text('change photo'),
+      body: SafeArea(
+        bottom: false,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.only(bottom: 110),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 18, 24, 10),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    _formatFriendlyDate(DateTime.now()),
+                    style: text.quicksandHeading.copyWith(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: _confirmGlimmer,
-                      icon: const Icon(Icons.check),
-                      label: const Text('confirm'),
-                    ),
+                ),
+              ),
+
+              // Illustration or selected photo
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 28,
+                  vertical: 10,
+                ),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  child: hasSelectedImage
+                      ? _SelectedPhotoPreview(
+                          key: const ValueKey('selected-photo'),
+                          imagePath: _selectedImage!.path,
+                        )
+                      : _UploadIllustration(
+                          key: const ValueKey('upload-illustration'),
+                          colors: colors,
+                        ),
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              // Main content panel
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.fromLTRB(24, 28, 24, 30),
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(34),
                   ),
-                ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      hasSelectedImage
+                          ? 'your glimmer'
+                          : 'capture today’s glimmer',
+                      textAlign: TextAlign.center,
+                      style: text.quicksandHeading.copyWith(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 16,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colors.primary.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(22),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'today’s prompt',
+                            style: text.quicksandSmall.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: colors.primary,
+                            ),
+                          ),
+                          const SizedBox(height: 7),
+                          Text(
+                            prompt.text,
+                            style: text.quicksandBody.copyWith(
+                              fontSize: 18,
+                              height: 1.3,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    if (!hasSelectedImage) ...[
+                      ElevatedButton.icon(
+                        onPressed: _showImageSourcePicker,
+                        icon: const Icon(Icons.add_photo_alternate_outlined),
+                        label: const Text('add a photo'),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        'take a photo or choose one from your gallery',
+                        textAlign: TextAlign.center,
+                        style: text.quicksandSmall.copyWith(
+                          color: colors.onSurface.withValues(alpha: 0.62),
+                        ),
+                      ),
+                    ] else ...[
+                      TextField(
+                        controller: _captionController,
+                        maxLines: 3,
+                        textInputAction: TextInputAction.done,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: colors.surfaceContainerHighest.withValues(
+                            alpha: 0.5,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(22),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 18),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: _showImageSourcePicker,
+                              icon: const Icon(Icons.swap_horiz),
+                              label: const Text('change'),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: _confirmGlimmer,
+                              icon: const Icon(Icons.auto_awesome),
+                              label: const Text('share'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+
+                    const SizedBox(height: 16),
+
+                    Text(
+                      'one small moment.',
+                      textAlign: TextAlign.center,
+                      style: text.quicksandSmall.copyWith(
+                        color: colors.onSurface.withValues(alpha: 0.58),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
-          ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _UploadIllustration extends StatelessWidget {
+  final ColorScheme colors;
+
+  const _UploadIllustration({super.key, required this.colors});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 280,
+      width: double.infinity,
+      child: Image.asset(
+        'assets/illustrations/upload_glimmer.png',
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            decoration: BoxDecoration(
+              color: colors.primary.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(30),
+            ),
+            child: Icon(
+              Icons.photo_outlined,
+              size: 90,
+              color: colors.primary.withValues(alpha: 0.65),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _SelectedPhotoPreview extends StatelessWidget {
+  final String imagePath;
+
+  const _SelectedPhotoPreview({super.key, required this.imagePath});
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(28),
+      child: AspectRatio(
+        aspectRatio: 1,
+        child: Image.file(
+          File(imagePath),
+          width: double.infinity,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return const Center(
+              child: Icon(Icons.broken_image_outlined, size: 52),
+            );
+          },
         ),
       ),
     );

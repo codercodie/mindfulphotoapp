@@ -36,12 +36,14 @@ class ProfileScreen extends ConsumerWidget {
     final hasPronouns =
         profile.pronouns != null && profile.pronouns!.trim().isNotEmpty;
     final hasBio = profile.bio!.trim().isNotEmpty;
+
     final glimmerCount = profilePosts.length;
     final glimmerLabel = glimmerCount == 1 ? 'glimmer' : 'glimmers';
 
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: userId != null,
+        titleSpacing: 20,
         title: Text(
           '@${profile.username}',
           style: text.quicksandHeading.copyWith(
@@ -81,7 +83,7 @@ class ProfileScreen extends ConsumerWidget {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 100),
+        padding: const EdgeInsets.fromLTRB(20, 10, 20, 100),
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -99,30 +101,30 @@ class ProfileScreen extends ConsumerWidget {
                             profile.displayName,
                             overflow: TextOverflow.ellipsis,
                             style: text.quicksandHeading.copyWith(
-                              fontSize: 23,
+                              fontSize: 22,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
                         const SizedBox(width: 5),
-                        const Text('✦', style: TextStyle(fontSize: 20)),
+                        const Text('✦', style: TextStyle(fontSize: 19)),
                       ],
                     ),
                     if (hasPronouns) ...[
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 3),
                       Text(
                         profile.pronouns!,
                         style: text.quicksandSmall.copyWith(
-                          fontSize: 13,
-                          color: colors.onSurface.withValues(alpha: 0.58),
+                          fontSize: 16,
+                          color: colors.onSurface.withValues(alpha: 0.68),
                         ),
                       ),
                     ],
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
                     Text(
                       '$glimmerCount $glimmerLabel',
                       style: text.quicksandSmall.copyWith(
-                        fontSize: 13,
+                        fontSize: 14,
                         color: colors.primary,
                         fontWeight: FontWeight.w600,
                       ),
@@ -132,19 +134,17 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ],
           ),
-
           if (hasBio) ...[
-            const SizedBox(height: 18),
+            const SizedBox(height: 15),
             Text(
               profile.bio!.trim(),
-              style: text.quicksandBody.copyWith(fontSize: 15, height: 1.35),
+              style: text.quicksandBody.copyWith(fontSize: 18, height: 1.35),
             ),
           ],
-
           if (profile.interestIds.isNotEmpty) ...[
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             SizedBox(
-              height: 42,
+              height: 38,
               child: Stack(
                 alignment: Alignment.center,
                 children: [
@@ -172,9 +172,7 @@ class ProfileScreen extends ConsumerWidget {
               alignment: WrapAlignment.center,
             ),
           ],
-
-          const SizedBox(height: 22),
-
+          const SizedBox(height: 24),
           Row(
             children: [
               ProfileStat(
@@ -191,20 +189,25 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ],
           ),
-
           const SizedBox(height: 28),
+          Text(
+            'glimmers',
+            style: text.quicksandHeading.copyWith(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           const SizedBox(height: 10),
-
           if (profilePosts.isEmpty)
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24),
+              padding: const EdgeInsets.symmetric(vertical: 28),
               child: Center(
                 child: Text(
-                  'no glimmers yet :(',
+                  'no glimmers yet',
                   textAlign: TextAlign.center,
                   style: text.quicksandBody.copyWith(
                     fontSize: 15,
-                    color: colors.onSurface.withValues(alpha: 0.6),
+                    color: colors.onSurface.withValues(alpha: 0.68),
                   ),
                 ),
               ),
@@ -234,31 +237,33 @@ class ProfileScreen extends ConsumerWidget {
       useSafeArea: true,
       isScrollControlled: true,
       builder: (sheetContext) {
-        return FractionallySizedBox(
-          heightFactor: 0.55,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  '$displayName’s interests',
-                  textAlign: TextAlign.center,
-                  style: text.quicksandHeading.copyWith(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 18),
-                Expanded(
-                  child: SingleChildScrollView(
-                    child: InterestList(
-                      interestIds: interestIds,
-                      alignment: WrapAlignment.center,
+        return SafeArea(
+          top: false,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.7,
+            ),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    '$displayName’s interests',
+                    textAlign: TextAlign.center,
+                    style: text.quicksandHeading.copyWith(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 18),
+                  InterestList(
+                    interestIds: interestIds,
+                    alignment: WrapAlignment.center,
+                  ),
+                ],
+              ),
             ),
           ),
         );

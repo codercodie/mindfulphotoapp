@@ -46,6 +46,8 @@ class InterestList extends StatelessWidget {
       children: visibleInterests.map((interest) {
         return Chip(
           visualDensity: VisualDensity.compact,
+          backgroundColor: colors.surface.withValues(alpha: 0.85),
+          side: BorderSide(color: colors.onSurface.withValues(alpha: 0.16)),
           avatar: Text(interest.emoji),
           label: Text(interest.id),
         );

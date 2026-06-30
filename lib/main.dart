@@ -40,6 +40,7 @@ class _MainNavigationState extends State<MainNavigation> {
   @override
   Widget build(BuildContext context) {
     final screens = [
+      const HomeScreen(),
       CameraScreen(
         onGlimmerSaved: () {
           setState(() {
@@ -47,7 +48,6 @@ class _MainNavigationState extends State<MainNavigation> {
           });
         },
       ),
-      const HomeScreen(),
       // const CornersScreen(),
       const ProfileScreen(),
     ];
@@ -64,14 +64,14 @@ class _MainNavigationState extends State<MainNavigation> {
         },
         destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.add_outlined, size: 31),
-            selectedIcon: Icon(Icons.add, size: 31),
-            label: 'add glimmer',
-          ),
-          NavigationDestination(
             icon: Icon(Icons.home_outlined),
             selectedIcon: Icon(Icons.home),
             label: 'home',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.add_outlined, size: 31),
+            selectedIcon: Icon(Icons.add, size: 31),
+            label: 'add glimmer',
           ),
           // NavigationDestination(
           //   icon: Icon(Icons.group_outlined),
