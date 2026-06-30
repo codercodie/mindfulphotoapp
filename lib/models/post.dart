@@ -9,9 +9,9 @@ class Post {
   final String caption;
   final String? imagePath;
   final DateTime createdAt;
-  final Map<Reaction, int> reactions;
 
-  final Reaction? currentUserReaction;
+  final Map<Reaction, int> reactions;
+  final Set<Reaction> currentUserReactions;
 
   const Post({
     required this.id,
@@ -21,7 +21,7 @@ class Post {
     this.imagePath,
     required this.createdAt,
     required this.reactions,
-    this.currentUserReaction,
+    this.currentUserReactions = const {},
   });
 
   Post copyWith({
@@ -32,7 +32,7 @@ class Post {
     Object? imagePath = _notProvided,
     DateTime? createdAt,
     Map<Reaction, int>? reactions,
-    Object? currentUserReaction = _notProvided,
+    Set<Reaction>? currentUserReactions,
   }) {
     return Post(
       id: id ?? this.id,
@@ -44,9 +44,7 @@ class Post {
           : imagePath as String?,
       createdAt: createdAt ?? this.createdAt,
       reactions: reactions ?? this.reactions,
-      currentUserReaction: identical(currentUserReaction, _notProvided)
-          ? this.currentUserReaction
-          : currentUserReaction as Reaction?,
+      currentUserReactions: currentUserReactions ?? this.currentUserReactions,
     );
   }
 }

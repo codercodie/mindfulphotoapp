@@ -19,76 +19,164 @@ class FeedCard extends ConsumerWidget {
   const FeedCard({super.key, required this.post, this.onAuthorTap});
 
   Future<void> _showReactionPicker(BuildContext context, WidgetRef ref) async {
-    final selectedReaction = await showModalBottomSheet<Reaction>(
+    final selectedReactions = Set<Reaction>.from(post.currentUserReactions);
+
+    final result = await showModalBottomSheet<Set<Reaction>>(
       context: context,
       showDragHandle: true,
-      builder: (context) {
-        final text = Theme.of(context).textTheme;
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (sheetContext) {
+        return StatefulBuilder(
+          builder: (context, setSheetState) {
+            final text = Theme.of(context).textTheme;
+            final colors = Theme.of(context).colorScheme;
 
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'choose a reaction',
-                  style: text.quicksandHeading.copyWith(fontSize: 20),
-                ),
-                const SizedBox(height: 18),
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: Reaction.values.map((reaction) {
-                    final isSelected = post.currentUserReaction == reaction;
-
-                    return InkWell(
-                      onTap: () {
-                        Navigator.of(context).pop(reaction);
-                      },
-                      borderRadius: BorderRadius.circular(18),
-                      child: Container(
-                        width: 74,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? Theme.of(
-                                  context,
-                                ).colorScheme.primary.withValues(alpha: 0.15)
-                              : Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              reaction.emoji,
-                              style: const TextStyle(fontSize: 28),
-                            ),
-                            const SizedBox(height: 5),
-                            Text(
-                              reaction.label,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(fontSize: 11),
-                            ),
-                          ],
+            return SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'choose reactions',
+                          style: text.quicksandHeading.copyWith(fontSize: 20),
                         ),
                       ),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
-          ),
+                      Text(
+                        '${selectedReactions.length}/5',
+                        style: text.quicksandSmall.copyWith(
+                          color: colors.onSurface.withValues(alpha: 0.6),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 6),
+
+                  Text(
+                    'select up to five reactions.',
+                    style: text.quicksandSmall.copyWith(
+                      color: colors.onSurface.withValues(alpha: 0.6),
+                    ),
+                  ),
+
+                  const SizedBox(height: 18),
+
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: Reaction.values.map((reaction) {
+                      final isSelected = selectedReactions.contains(reaction);
+
+                      return InkWell(
+                        onTap: () {
+                          if (isSelected) {
+                            setSheetState(() {
+                              selectedReactions.remove(reaction);
+                            });
+
+                            return;
+                          }
+
+                          if (selectedReactions.length >= 5) {
+                            ScaffoldMessenger.of(sheetContext).showSnackBar(
+                              const SnackBar(
+                                content: Text(
+                                  'you can select up to five reactions.',
+                                ),
+                              ),
+                            );
+
+                            return;
+                          }
+
+                          setSheetState(() {
+                            selectedReactions.add(reaction);
+                          });
+                        },
+                        borderRadius: BorderRadius.circular(18),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 150),
+                          width: 92,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? colors.primary.withValues(alpha: 0.16)
+                                : colors.surface,
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                              color: isSelected
+                                  ? colors.primary
+                                  : colors.onSurface.withValues(alpha: 0.12),
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                reaction.emoji,
+                                style: const TextStyle(fontSize: 28),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                reaction.label,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontSize: 11),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  Row(
+                    children: [
+                      TextButton(
+                        onPressed: selectedReactions.isEmpty
+                            ? null
+                            : () {
+                                setSheetState(() {
+                                  selectedReactions.clear();
+                                });
+                              },
+                        child: const Text('clear'),
+                      ),
+                      const Spacer(),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(
+                            sheetContext,
+                          ).pop(Set<Reaction>.from(selectedReactions));
+                        },
+                        child: const Text('done'),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
     );
 
-    if (selectedReaction == null) {
+    if (result == null) {
       return;
     }
 
-    ref.read(postStoreProvider.notifier).reactToPost(post.id, selectedReaction);
+    ref.read(postStoreProvider.notifier).setUserReactions(post.id, result);
   }
 
   @override
@@ -158,22 +246,9 @@ class FeedCard extends ConsumerWidget {
                 color: colors.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(18),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Prompt',
-                    style: text.small.copyWith(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 10,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    post.prompt,
-                    style: text.prompt.copyWith(fontSize: 14, height: 1.15),
-                  ),
-                ],
+              child: Text(
+                post.prompt,
+                style: text.prompt.copyWith(fontSize: 14, height: 1.15),
               ),
             ),
 
@@ -209,11 +284,34 @@ class FeedCard extends ConsumerWidget {
                         reaction: entry.key,
                         count: entry.value,
                         showCount: showReactionCounts,
-                        isSelected: post.currentUserReaction == entry.key,
+                        isSelected: post.currentUserReactions.contains(
+                          entry.key,
+                        ),
                         onTap: () {
+                          final selectedReactions = Set<Reaction>.from(
+                            post.currentUserReactions,
+                          );
+
+                          if (selectedReactions.contains(entry.key)) {
+                            selectedReactions.remove(entry.key);
+                          } else {
+                            if (selectedReactions.length >= 5) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'you can select up to five reactions.',
+                                  ),
+                                ),
+                              );
+                              return;
+                            }
+
+                            selectedReactions.add(entry.key);
+                          }
+
                           ref
                               .read(postStoreProvider.notifier)
-                              .reactToPost(post.id, entry.key);
+                              .setUserReactions(post.id, selectedReactions);
                         },
                       );
                     }).toList(),
@@ -221,9 +319,9 @@ class FeedCard extends ConsumerWidget {
                 ),
                 const SizedBox(width: 8),
                 IconButton(
-                  tooltip: post.currentUserReaction == null
-                      ? 'Add reaction'
-                      : 'Change reaction',
+                  tooltip: post.currentUserReactions.isEmpty
+                      ? 'add reactions'
+                      : 'change reactions',
                   onPressed: () {
                     _showReactionPicker(context, ref);
                   },
@@ -233,10 +331,10 @@ class FeedCard extends ConsumerWidget {
                     minHeight: 42,
                   ),
                   icon: Icon(
-                    post.currentUserReaction == null
+                    post.currentUserReactions.isEmpty
                         ? Icons.add_reaction_outlined
                         : Icons.add_reaction,
-                    color: post.currentUserReaction == null
+                    color: post.currentUserReactions.isEmpty
                         ? colors.onSurface.withValues(alpha: 0.65)
                         : colors.primary,
                   ),
@@ -251,18 +349,18 @@ class FeedCard extends ConsumerWidget {
 
   String _formatDate(DateTime date) {
     const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
+      'jan',
+      'feb',
+      'mar',
+      'apr',
+      'may',
+      'jun',
+      'jul',
+      'aug',
+      'sep',
+      'oct',
+      'nov',
+      'dec',
     ];
 
     return '${months[date.month - 1]} ${date.day}, ${date.year}';

@@ -80,7 +80,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
 
         return SafeArea(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,7 +89,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
                   'add a photo',
                   style: text.quicksandHeading.copyWith(fontSize: 20),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 20),
                 ListTile(
                   leading: const Icon(Icons.photo_camera_outlined),
                   title: const Text('take a photo'),

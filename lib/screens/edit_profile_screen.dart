@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import '../state/profile_store.dart';
 import '../theme/text_styles.dart';
 import '../widgets/profile_avatar.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
@@ -46,23 +47,54 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   Future<void> _changeProfilePhoto() async {
     final image = await _picker.pickImage(
       source: ImageSource.gallery,
-      imageQuality: 85,
-      maxWidth: 1000,
+      imageQuality: 95,
+      maxWidth: 2000,
     );
 
-    if (image == null) return;
+    if (image == null || !mounted) {
+      return;
+    }
+
+    final croppedImage = await ImageCropper().cropImage(
+      sourcePath: image.path,
+      aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+      maxWidth: 1000,
+      maxHeight: 1000,
+      compressQuality: 90,
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'crop profile photo',
+          initAspectRatio: CropAspectRatioPreset.square,
+          lockAspectRatio: true,
+          aspectRatioPresets: [CropAspectRatioPreset.square],
+        ),
+        IOSUiSettings(
+          title: 'crop profile photo',
+          aspectRatioLockEnabled: true,
+          resetAspectRatioEnabled: false,
+          aspectRatioPickerButtonHidden: true,
+          aspectRatioPresets: [CropAspectRatioPreset.square],
+        ),
+      ],
+    );
+
+    if (croppedImage == null || !mounted) {
+      return;
+    }
 
     final directory = await getApplicationDocumentsDirectory();
 
-    final extension = path.extension(image.path).isEmpty
+    final extension = path.extension(croppedImage.path).isEmpty
         ? '.jpg'
-        : path.extension(image.path);
+        : path.extension(croppedImage.path);
 
-    final savedImage = await File(image.path).copy(
+    final savedImage = await File(croppedImage.path).copy(
       '${directory.path}/profile_${DateTime.now().millisecondsSinceEpoch}$extension',
     );
 
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
 
     setState(() {
       _profileImagePath = savedImage.path;

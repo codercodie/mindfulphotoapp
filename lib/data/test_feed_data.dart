@@ -9,7 +9,7 @@ final List<Post> testFeedPosts = [
     caption: 'The light hit my coffee perfectly this morning.',
     imagePath: 'assets/posts/coffee.jpeg',
     createdAt: DateTime(2026, 6, 18),
-    reactions: {Reaction.smile: 12, Reaction.sparkle: 5, Reaction.zen: 3},
+    reactions: {Reaction.smile: 12, Reaction.heart: 5, Reaction.zen: 3},
   ),
   Post(
     id: 'post_002',
@@ -23,7 +23,7 @@ final List<Post> testFeedPosts = [
       Reaction.hugs: 2,
       Reaction.zen: 10,
       Reaction.smile: 1,
-      Reaction.sparkle: 3,
+      Reaction.fire: 3,
     },
   ),
   Post(
@@ -33,6 +33,6 @@ final List<Post> testFeedPosts = [
     caption: 'So bright and beautiful.',
     imagePath: 'assets/posts/flower.jpeg',
     createdAt: DateTime(2026, 6, 16),
-    reactions: {Reaction.wow: 4, Reaction.sparkle: 9, Reaction.smile: 6},
+    reactions: {Reaction.wow: 4, Reaction.party: 9, Reaction.smile: 6},
   ),
 ];

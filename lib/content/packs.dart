@@ -4,7 +4,7 @@ const List<Pack> packs = [everydayPack, naturePack, indoorsPack];
 
 const everydayPack = Pack(
   id: 'everyday',
-  name: 'Everyday Sparks',
+  name: 'Everyday Prompts',
   description: 'Gentle prompts for noticing good things nearby.',
   prompts: [
     Prompt(
@@ -27,7 +27,7 @@ const everydayPack = Pack(
 
 const naturePack = Pack(
   id: 'nature',
-  name: 'Nature Sparks',
+  name: 'Nature Prompts',
   description: 'Small details from the world outside.',
   prompts: [
     Prompt(id: 'nature_001', text: 'something growing.', category: 'nature'),
@@ -41,7 +41,7 @@ const naturePack = Pack(
 
 const indoorsPack = Pack(
   id: 'indoors',
-  name: 'Indoors Sparks',
+  name: 'Indoor Prompts',
   description: 'Small details from the world inside.',
   prompts: [
     Prompt(

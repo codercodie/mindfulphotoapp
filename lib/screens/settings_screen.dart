@@ -20,12 +20,7 @@ class SettingsScreen extends ConsumerWidget {
     final settings = ref.watch(appSettingsProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'settings',
-          style: text.quicksandHeading,
-        ),
-      ),
+      appBar: AppBar(title: Text('settings', style: text.quicksandHeading)),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 40),
         children: [
@@ -36,11 +31,11 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 10),
 
           ...themePacks.map((themePack) {
-            final isActive =
-                profile.enabledThemePackId == themePack.id;
+            final isActive = profile.enabledThemePackId == themePack.id;
 
-            final isUnlocked =
-                profile.unlockedThemePackIds.contains(themePack.id);
+            final isUnlocked = profile.unlockedThemePackIds.contains(
+              themePack.id,
+            );
 
             return Padding(
               padding: const EdgeInsets.only(bottom: 10),
@@ -68,11 +63,9 @@ class SettingsScreen extends ConsumerWidget {
           const SizedBox(height: 10),
 
           ...packs.map((pack) {
-            final isUnlocked =
-                profile.unlockedPromptPackIds.contains(pack.id);
+            final isUnlocked = profile.unlockedPromptPackIds.contains(pack.id);
 
-            final isActive =
-                profile.enabledPromptPackIds.contains(pack.id);
+            final isActive = profile.enabledPromptPackIds.contains(pack.id);
 
             void showUnlockInfo() {
               _showUnlockInfo(
@@ -86,9 +79,7 @@ class SettingsScreen extends ConsumerWidget {
               contentPadding: EdgeInsets.zero,
               onTap: isUnlocked ? null : showUnlockInfo,
               leading: Icon(
-                isUnlocked
-                    ? Icons.auto_awesome_outlined
-                    : Icons.lock_outline,
+                isUnlocked ? Icons.auto_awesome_outlined : Icons.lock_outline,
                 color: isUnlocked
                     ? null
                     : colors.onSurface.withValues(alpha: 0.45),
@@ -120,10 +111,7 @@ class SettingsScreen extends ConsumerWidget {
 
                         ref
                             .read(profileStoreProvider.notifier)
-                            .setPromptPackEnabled(
-                              pack.id,
-                              enabled,
-                            );
+                            .setPromptPackEnabled(pack.id, enabled);
                       },
                     )
                   : IconButton(
@@ -146,9 +134,7 @@ class SettingsScreen extends ConsumerWidget {
             contentPadding: EdgeInsets.zero,
             secondary: const Icon(Icons.tag_faces_outlined),
             title: const Text('show reaction counts'),
-            subtitle: const Text(
-              'display the number beside each reaction.',
-            ),
+            subtitle: const Text('display the number beside each reaction.'),
             value: settings.showReactionCounts,
             onChanged: (value) {
               ref
@@ -161,9 +147,7 @@ class SettingsScreen extends ConsumerWidget {
             contentPadding: EdgeInsets.zero,
             secondary: const Icon(Icons.notifications_outlined),
             title: const Text('daily prompt reminder'),
-            subtitle: const Text(
-              'remind me when the daily prompt is ready.',
-            ),
+            subtitle: const Text('remind me when the daily prompt is ready.'),
             value: settings.dailyPromptReminder,
             onChanged: (value) {
               ref
@@ -176,14 +160,10 @@ class SettingsScreen extends ConsumerWidget {
             contentPadding: EdgeInsets.zero,
             secondary: const Icon(Icons.motion_photos_off_outlined),
             title: const Text('reduce motion'),
-            subtitle: const Text(
-              'use fewer animations and transitions.',
-            ),
+            subtitle: const Text('use fewer animations and transitions.'),
             value: settings.reduceMotion,
             onChanged: (value) {
-              ref
-                  .read(appSettingsProvider.notifier)
-                  .setReduceMotion(value);
+              ref.read(appSettingsProvider.notifier).setReduceMotion(value);
             },
           ),
 
@@ -193,9 +173,7 @@ class SettingsScreen extends ConsumerWidget {
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.lock_outline),
             title: const Text('privacy'),
-            subtitle: const Text(
-              'profile visibility and blocked accounts',
-            ),
+            subtitle: const Text('profile visibility and blocked accounts'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
               // Add privacy settings page later.
@@ -206,9 +184,7 @@ class SettingsScreen extends ConsumerWidget {
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.info_outline),
             title: const Text('about'),
-            subtitle: const Text(
-              'app information and acknowledgements',
-            ),
+            subtitle: const Text('app information and acknowledgements'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
               showAboutDialog(
@@ -230,10 +206,7 @@ class _SectionHeading extends StatelessWidget {
   final String title;
   final String description;
 
-  const _SectionHeading({
-    required this.title,
-    required this.description,
-  });
+  const _SectionHeading({required this.title, required this.description});
 
   @override
   Widget build(BuildContext context) {
@@ -243,12 +216,7 @@ class _SectionHeading extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: text.quicksandHeading.copyWith(
-            fontSize: 22,
-          ),
-        ),
+        Text(title, style: text.quicksandHeading.copyWith(fontSize: 22)),
         const SizedBox(height: 3),
         Text(
           description,
@@ -288,10 +256,7 @@ class _ThemePackTile extends StatelessWidget {
 
     return ListTile(
       onTap: isUnlocked ? onTap : showUnlockInfo,
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: 14,
-        vertical: 5,
-      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
       minLeadingWidth: 62,
       horizontalTitleGap: 16,
       tileColor: colors.surface,
@@ -313,23 +278,17 @@ class _ThemePackTile extends StatelessWidget {
               Positioned(
                 left: 0,
                 top: 1,
-                child: _ColourDot(
-                  color: themePack.primary,
-                ),
+                child: _ColourDot(color: themePack.primary),
               ),
               Positioned(
                 left: 17,
                 top: 1,
-                child: _ColourDot(
-                  color: themePack.secondary,
-                ),
+                child: _ColourDot(color: themePack.secondary),
               ),
               Positioned(
                 left: 34,
                 top: 1,
-                child: _ColourDot(
-                  color: themePack.accent,
-                ),
+                child: _ColourDot(color: themePack.accent),
               ),
             ],
           ),
@@ -344,24 +303,19 @@ class _ThemePackTile extends StatelessWidget {
               : colors.onSurface.withValues(alpha: 0.45),
         ),
       ),
-      subtitle: isActive
-          ? const Text('current theme')
-          : null,
+      subtitle: isActive ? const Text('current theme') : null,
       trailing: isActive
-          ? Icon(
-              Icons.check_circle,
-              color: colors.primary,
-            )
+          ? Icon(Icons.check_circle, color: colors.primary)
           : isUnlocked
-              ? Icon(
-                  Icons.circle_outlined,
-                  color: colors.onSurface.withValues(alpha: 0.45),
-                )
-              : IconButton(
-                  tooltip: 'how to unlock',
-                  onPressed: showUnlockInfo,
-                  icon: const Icon(Icons.help_outline),
-                ),
+          ? Icon(
+              Icons.circle_outlined,
+              color: colors.onSurface.withValues(alpha: 0.45),
+            )
+          : IconButton(
+              tooltip: 'how to unlock',
+              onPressed: showUnlockInfo,
+              icon: const Icon(Icons.help_outline),
+            ),
     );
   }
 }
@@ -369,9 +323,7 @@ class _ThemePackTile extends StatelessWidget {
 class _ColourDot extends StatelessWidget {
   final Color color;
 
-  const _ColourDot({
-    required this.color,
-  });
+  const _ColourDot({required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -381,10 +333,7 @@ class _ColourDot extends StatelessWidget {
       decoration: BoxDecoration(
         color: color,
         shape: BoxShape.circle,
-        border: Border.all(
-          color: Colors.white,
-          width: 2,
-        ),
+        border: Border.all(color: Colors.white, width: 2),
       ),
     );
   }

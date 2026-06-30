@@ -24,40 +24,38 @@ class PostStore extends Notifier<List<Post>> {
     state = [post, ...state];
   }
 
-  void reactToPost(String postId, Reaction reaction) {
+  void setUserReactions(String postId, Set<Reaction> selectedReactions) {
+    final limitedReactions = selectedReactions.take(5).toSet();
+
     state = [
       for (final post in state)
-        if (post.id == postId) _updateReaction(post, reaction) else post,
+        if (post.id == postId)
+          _updateUserReactions(post, limitedReactions)
+        else
+          post,
     ];
   }
 
-  Post _updateReaction(Post post, Reaction selectedReaction) {
-    final updatedReactions = Map<Reaction, int>.from(post.reactions);
+  Post _updateUserReactions(Post post, Set<Reaction> selectedReactions) {
+    final updatedCounts = Map<Reaction, int>.from(post.reactions);
 
-    final previousReaction = post.currentUserReaction;
+    final previousReactions = post.currentUserReactions;
 
-    // Selecting the same reaction removes it.
-    if (previousReaction == selectedReaction) {
-      _decreaseReactionCount(updatedReactions, selectedReaction);
+    final removedReactions = previousReactions.difference(selectedReactions);
 
-      return post.copyWith(
-        reactions: updatedReactions,
-        currentUserReaction: null,
-      );
+    final addedReactions = selectedReactions.difference(previousReactions);
+
+    for (final reaction in removedReactions) {
+      _decreaseReactionCount(updatedCounts, reaction);
     }
 
-    // Remove the user's previous reaction first.
-    if (previousReaction != null) {
-      _decreaseReactionCount(updatedReactions, previousReaction);
+    for (final reaction in addedReactions) {
+      updatedCounts[reaction] = (updatedCounts[reaction] ?? 0) + 1;
     }
-
-    // Add their newly selected reaction.
-    updatedReactions[selectedReaction] =
-        (updatedReactions[selectedReaction] ?? 0) + 1;
 
     return post.copyWith(
-      reactions: updatedReactions,
-      currentUserReaction: selectedReaction,
+      reactions: updatedCounts,
+      currentUserReactions: Set<Reaction>.unmodifiable(selectedReactions),
     );
   }
 
