@@ -207,7 +207,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(':( could not save glimmer: $error')),
+        SnackBar(content: Text(':( Could not save glimmer: $error')),
       );
     }
   }
@@ -283,11 +283,11 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
                   children: [
                     Text(
                       hasSelectedImage
-                          ? 'your glimmer'
-                          : 'capture today’s glimmer',
+                          ? 'Your glimmer'
+                          : 'Capture today’s glimmer',
                       textAlign: TextAlign.center,
                       style: text.quicksandHeading.copyWith(
-                        fontSize: 26,
+                        fontSize: 18,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -308,7 +308,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'today’s prompt',
+                            'Today’s prompt',
                             style: text.quicksandSmall.copyWith(
                               fontWeight: FontWeight.w700,
                               color: colors.primary,
@@ -333,26 +333,41 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
                       ElevatedButton.icon(
                         onPressed: _showImageSourcePicker,
                         icon: const Icon(Icons.add_photo_alternate_outlined),
-                        label: const Text('add a photo'),
+                        label: const Text('Add a photo'),
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        'take a photo or choose one from your gallery',
+                        'Take a photo or choose one from your gallery',
                         textAlign: TextAlign.center,
                         style: text.quicksandSmall.copyWith(
                           color: colors.onSurface.withValues(alpha: 0.62),
                         ),
                       ),
                     ] else ...[
+                      Text(
+                        'Add a caption',
+                        style: text.quicksandHeading.copyWith(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+
+                      const SizedBox(height: 10),
+
                       TextField(
                         controller: _captionController,
-                        maxLines: 3,
-                        textInputAction: TextInputAction.done,
+                        maxLines: 4,
+                        maxLength: 220,
+                        textCapitalization: TextCapitalization.sentences,
+                        textInputAction: TextInputAction.newline,
                         decoration: InputDecoration(
+                          hintText: 'Write something about your glimmer...',
+                          alignLabelWithHint: true,
                           filled: true,
                           fillColor: colors.surfaceContainerHighest.withValues(
                             alpha: 0.5,
                           ),
+                          contentPadding: const EdgeInsets.all(18),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(22),
                             borderSide: BorderSide.none,
@@ -360,7 +375,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
                         ),
                       ),
 
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 16),
 
                       Row(
                         children: [
@@ -368,7 +383,7 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
                             child: OutlinedButton.icon(
                               onPressed: _showImageSourcePicker,
                               icon: const Icon(Icons.swap_horiz),
-                              label: const Text('change'),
+                              label: const Text('Change'),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -376,22 +391,14 @@ class _CameraScreenState extends ConsumerState<CameraScreen> {
                             child: ElevatedButton.icon(
                               onPressed: _confirmGlimmer,
                               icon: const Icon(Icons.auto_awesome),
-                              label: const Text('share'),
+                              label: const Text('Share'),
                             ),
                           ),
                         ],
                       ),
+
+                      const SizedBox(height: 16),
                     ],
-
-                    const SizedBox(height: 16),
-
-                    Text(
-                      'one small moment.',
-                      textAlign: TextAlign.center,
-                      style: text.quicksandSmall.copyWith(
-                        color: colors.onSurface.withValues(alpha: 0.58),
-                      ),
-                    ),
                   ],
                 ),
               ),

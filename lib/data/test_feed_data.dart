@@ -39,6 +39,7 @@ final List<Post> testFeedPosts = [
       Reaction.party: 9,
       Reaction.smile: 6,
       Reaction.beautiful: 2,
+      Reaction.heart: 1,
     },
   ),
 ];

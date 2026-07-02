@@ -14,6 +14,7 @@ class ThemePack {
   final Color mutedText;
 
   final bool unlocked;
+  final String unlockCondition;
 
   final double cardRadius;
   final double imageRadius;
@@ -30,6 +31,7 @@ class ThemePack {
     required this.text,
     required this.mutedText,
     required this.unlocked,
+    required this.unlockCondition,
     this.cardRadius = 32,
     this.imageRadius = 28,
   });

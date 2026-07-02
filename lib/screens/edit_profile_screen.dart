@@ -79,13 +79,13 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       compressQuality: 90,
       uiSettings: [
         AndroidUiSettings(
-          toolbarTitle: 'crop profile photo',
+          toolbarTitle: 'Crop profile photo',
           initAspectRatio: CropAspectRatioPreset.square,
           lockAspectRatio: true,
           aspectRatioPresets: [CropAspectRatioPreset.square],
         ),
         IOSUiSettings(
-          title: 'crop profile photo',
+          title: 'Crop profile photo',
           aspectRatioLockEnabled: true,
           resetAspectRatioEnabled: false,
           aspectRatioPickerButtonHidden: true,
@@ -132,7 +132,49 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     if (displayName.isEmpty || username.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('display name and username are required.'),
+          content: Text('Display name and Username are required.'),
+        ),
+      );
+      return;
+    }
+
+    if (displayName.length > ProfileLimits.displayName) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Display name cannot exceed ${ProfileLimits.displayName} characters.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (username.length > ProfileLimits.username) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Username cannot exceed ${ProfileLimits.username} characters.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (pronouns.length > ProfileLimits.pronouns) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Pronouns cannot exceed ${ProfileLimits.pronouns} characters.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (bio.length > ProfileLimits.bio) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Bio cannot exceed ${ProfileLimits.bio} characters.'),
         ),
       );
       return;
@@ -146,7 +188,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
     if (usernameTaken) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('that username is already taken')),
+        const SnackBar(
+          content: Text('That must be a good username, it\'s already taken 🥲'),
+        ),
       );
       return;
     }
@@ -182,7 +226,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     final text = Theme.of(context).textTheme;
 
     return Scaffold(
-      appBar: AppBar(title: Text('edit profile', style: text.quicksandHeading)),
+      appBar: AppBar(title: Text('Edit profile', style: text.quicksandHeading)),
       body: SafeArea(
         top: false,
         child: ListView(
@@ -196,33 +240,40 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               child: TextButton.icon(
                 onPressed: _changeProfilePhoto,
                 icon: const Icon(Icons.photo_camera_outlined),
-                label: const Text('change photo'),
+                label: const Text('Change photo'),
               ),
             ),
             const SizedBox(height: 24),
             _ProfileField(
-              label: 'display name',
+              label: 'Display name',
               controller: _displayNameController,
+              maxChars: ProfileLimits.displayName,
             ),
             const SizedBox(height: 16),
             _ProfileField(
-              label: 'username',
+              label: 'Username',
               controller: _usernameController,
               prefixText: '@',
+              maxChars: ProfileLimits.username,
             ),
             const SizedBox(height: 16),
-            _ProfileField(label: 'pronouns', controller: _pronounsController),
+            _ProfileField(
+              label: 'Pronouns',
+              controller: _pronounsController,
+              maxChars: ProfileLimits.pronouns,
+            ),
             const SizedBox(height: 16),
             _ProfileField(
-              label: 'bio',
+              label: 'Bio',
               controller: _bioController,
-              maxLines: 4,
+              maxLines: 6,
+              maxChars: ProfileLimits.bio,
             ),
             const SizedBox(height: 24),
             Row(
               children: [
                 Text(
-                  'interests',
+                  'Interests',
                   style: text.quicksandHeading.copyWith(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -249,20 +300,20 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     });
                   },
                   icon: const Icon(Icons.edit_outlined, size: 17),
-                  label: const Text('edit'),
+                  label: const Text('Edit'),
                 ),
               ],
             ),
             const SizedBox(height: 8),
             InterestList(
               interestIds: _selectedInterestIds,
-              emptyText: 'what are you interested in?',
+              emptyText: 'What are you interested in?',
               alignment: WrapAlignment.center,
             ),
             const SizedBox(height: 28),
             ElevatedButton(
               onPressed: _saveProfile,
-              child: const Text('save changes'),
+              child: const Text('Save changes'),
             ),
           ],
         ),
@@ -271,17 +322,28 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 }
 
+extension on TextEditingController {}
+
+class ProfileLimits {
+  static const int displayName = 30;
+  static const int username = 20;
+  static const int pronouns = 25;
+  static const int bio = 200;
+}
+
 class _ProfileField extends StatelessWidget {
   final String label;
   final TextEditingController controller;
   final String? prefixText;
   final int maxLines;
+  final int? maxChars;
 
   const _ProfileField({
     required this.label,
     required this.controller,
     this.prefixText,
     this.maxLines = 1,
+    this.maxChars,
   });
 
   @override

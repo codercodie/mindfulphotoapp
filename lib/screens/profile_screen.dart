@@ -31,6 +31,15 @@ class ProfileScreen extends ConsumerWidget {
     }
 
     final isCurrentUser = profile.id == currentUser.id;
+    final displayedInterestIds = isCurrentUser
+        ? profile.interestIds
+        : profile.interestIds.where(currentUser.interestIds.contains).toList();
+
+    final interestHeading = isCurrentUser ? 'interests' : 'common interests';
+
+    const interestPreviewLimit = 5;
+
+    final hasMoreInterests = displayedInterestIds.length > interestPreviewLimit;
     final profilePosts = ref.watch(postsByUserProvider(profile.id));
 
     final hasPronouns =
@@ -157,55 +166,45 @@ class ProfileScreen extends ConsumerWidget {
               style: text.quicksandBody.copyWith(fontSize: 14, height: 1.35),
             ),
           ],
-          if (profile.interestIds.isNotEmpty) ...[
-            const SizedBox(height: 10),
-            Text(
-              'common interests',
-              style: text.quicksandSmall.copyWith(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+          if (displayedInterestIds.isNotEmpty) ...[
+            const SizedBox(height: 20),
+
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      if (profile.interestIds.length > 6)
-                        TextButton(
-                          onPressed: () {
-                            _showAllInterests(
-                              context,
-                              profile.displayName,
-                              profile.interestIds,
-                            );
-                          },
-                          style: TextButton.styleFrom(
-                            textStyle: text.quicksandSmall.copyWith(
-                              fontWeight: FontWeight.w600,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                          child: Text('see all interests'),
-                        ),
-                        
-                    ],
+                  child: Text(
+                    interestHeading,
+                    style: text.quicksandHeading.copyWith(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-                
+
+                if (hasMoreInterests)
+                  TextButton(
+                    onPressed: () {
+                      _showAllInterests(
+                        context,
+                        isCurrentUser ? 'your interests' : 'common interests',
+                        displayedInterestIds,
+                      );
+                    },
+                    child: const Text('see all'),
+                  ),
               ],
-            ),
-                        InterestList(
-              interestIds: profile.interestIds,
-              maxItems: 6,
-              alignment: WrapAlignment.spaceEvenly,
             ),
 
             const SizedBox(height: 5),
+
+            InterestList(
+              interestIds: displayedInterestIds,
+              maxItems: interestPreviewLimit,
+              alignment: WrapAlignment.center,
+            ),
           ],
-          const SizedBox(height: 5),
+          const SizedBox(height: 15),
           if (profilePosts.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 28),
@@ -234,7 +233,7 @@ class ProfileScreen extends ConsumerWidget {
 
   void _showAllInterests(
     BuildContext context,
-    String displayName,
+    String title,
     List<String> interestIds,
   ) {
     final text = Theme.of(context).textTheme;
@@ -258,7 +257,7 @@ class ProfileScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    '$displayName’s interests',
+                    title,
                     textAlign: TextAlign.center,
                     style: text.quicksandHeading.copyWith(
                       fontSize: 20,

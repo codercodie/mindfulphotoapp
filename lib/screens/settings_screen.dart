@@ -239,7 +239,7 @@ class _ThemePackTile extends StatelessWidget {
       _showUnlockInfo(
         context,
         title: themePack.name,
-        message: _themeUnlockMessage(themePack.id),
+        message: themePack.unlockCondition,
       );
     }
 
@@ -350,15 +350,6 @@ Future<void> _showUnlockInfo(
       );
     },
   );
-}
-
-String _themeUnlockMessage(String themeId) {
-  switch (themeId) {
-    case 'mist':
-      return 'unlock this theme by capturing 10 glimmers.';
-    default:
-      return 'this theme is not unlocked yet.';
-  }
 }
 
 String _promptPackUnlockMessage(String packId) {

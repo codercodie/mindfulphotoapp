@@ -12,6 +12,7 @@ class Theme {
   final Color text;
   final Color mutedText;
   final bool unlocked;
+  final String unlockCondition;
 
   const Theme({
     required this.id,
@@ -24,6 +25,7 @@ class Theme {
     required this.text,
     required this.mutedText,
     required this.unlocked,
+    required this.unlockCondition,
   });
 
   static const forest = Color(0xFF1E3D2F);
