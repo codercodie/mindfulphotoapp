@@ -83,7 +83,7 @@ class ProfileScreen extends ConsumerWidget {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 10, 20, 100),
+        padding: const EdgeInsets.fromLTRB(20, 5, 20, 100),
         children: [
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -101,13 +101,12 @@ class ProfileScreen extends ConsumerWidget {
                             profile.displayName,
                             overflow: TextOverflow.ellipsis,
                             style: text.quicksandHeading.copyWith(
-                              fontSize: 22,
+                              fontSize: 18,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
                         const SizedBox(width: 5),
-                        const Text('✦', style: TextStyle(fontSize: 19)),
                       ],
                     ),
                     if (hasPronouns) ...[
@@ -129,69 +128,84 @@ class ProfileScreen extends ConsumerWidget {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        ProfileStat(
+                          value: profile.friendIds.length.toString(),
+                          label: 'friends',
+                        ),
+                        ProfileStat(
+                          value: profile.followingIds.length.toString(),
+                          label: 'following',
+                        ),
+                        ProfileStat(
+                          value: profile.followerIds.length.toString(),
+                          label: 'followers',
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
             ],
           ),
           if (hasBio) ...[
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
             Text(
               profile.bio!.trim(),
               style: text.quicksandBody.copyWith(fontSize: 14, height: 1.35),
             ),
           ],
           if (profile.interestIds.isNotEmpty) ...[
-            const SizedBox(height: 5),
-            InterestList(
-              interestIds: profile.interestIds,
-              maxItems: 10,
-              alignment: WrapAlignment.spaceEvenly,
+            const SizedBox(height: 10),
+            Text(
+              'common interests',
+              style: text.quicksandSmall.copyWith(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Spacer(),
                 Expanded(
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: profile.interestIds.length > 10
-                        ? TextButton(
-                            onPressed: () {
-                              _showAllInterests(
-                                context,
-                                profile.displayName,
-                                profile.interestIds,
-                              );
-                            },
-                            child: const Text('see all 👀'),
-                          )
-                        : null,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      if (profile.interestIds.length > 6)
+                        TextButton(
+                          onPressed: () {
+                            _showAllInterests(
+                              context,
+                              profile.displayName,
+                              profile.interestIds,
+                            );
+                          },
+                          style: TextButton.styleFrom(
+                            textStyle: text.quicksandSmall.copyWith(
+                              fontWeight: FontWeight.w600,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                          child: Text('see all interests'),
+                        ),
+                        
+                    ],
                   ),
                 ),
+                
               ],
+            ),
+                        InterestList(
+              interestIds: profile.interestIds,
+              maxItems: 6,
+              alignment: WrapAlignment.spaceEvenly,
             ),
 
             const SizedBox(height: 5),
           ],
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              ProfileStat(
-                value: profile.friendIds.length.toString(),
-                label: 'friends',
-              ),
-              ProfileStat(
-                value: profile.followingIds.length.toString(),
-                label: 'following',
-              ),
-              ProfileStat(
-                value: profile.followerIds.length.toString(),
-                label: 'followers',
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 5),
           if (profilePosts.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 28),

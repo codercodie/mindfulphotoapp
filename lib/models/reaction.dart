@@ -16,6 +16,7 @@ enum Reaction {
   eyes,
   star,
   pray,
+  yum,
 }
 
 extension ReactionLabel on Reaction {
@@ -55,6 +56,8 @@ extension ReactionLabel on Reaction {
         return '⭐';
       case Reaction.pray:
         return '🙏';
+      case Reaction.yum:
+        return '😋';
     }
   }
 
@@ -79,21 +82,23 @@ extension ReactionLabel on Reaction {
       case Reaction.thumbsUp:
         return 'Thumbs Up';
       case Reaction.heart:
-        return 'Heart';
+        return 'Love this!';
       case Reaction.fire:
-        return 'Fire';
+        return 'Fiyah';
       case Reaction.party:
-        return 'Party';
+        return 'Celebrate';
       case Reaction.rocket:
-        return 'Rocket';
+        return 'Outa this world';
       case Reaction.clap:
         return 'Clap';
       case Reaction.eyes:
         return 'Eyes';
       case Reaction.star:
-        return 'Star';
+        return 'Shining';
       case Reaction.pray:
         return 'Pray';
+      case Reaction.yum:
+        return 'Yum!';
     }
   }
 }
