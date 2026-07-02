@@ -31,6 +31,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   final ImagePicker _picker = ImagePicker();
 
   String? _profileImagePath;
+  late List<String> _selectedInterestIds;
 
   @override
   void initState() {
@@ -43,6 +44,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     _usernameController = TextEditingController(text: profile.username);
     _pronounsController = TextEditingController(text: profile.pronouns ?? '');
     _bioController = TextEditingController(text: profile.bio);
+    _selectedInterestIds = List.from(profile.interestIds);
   }
 
   bool _isUsernameTaken({
@@ -159,6 +161,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           profileImagePath: _profileImagePath,
         );
 
+    ref
+        .read(profileStoreProvider.notifier)
+        .updateInterests(_selectedInterestIds);
+
     Navigator.of(context).pop();
   }
 
@@ -174,7 +180,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    final profile = ref.watch(profileStoreProvider);
 
     return Scaffold(
       appBar: AppBar(title: Text('edit profile', style: text.quicksandHeading)),
@@ -226,11 +231,22 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 const Spacer(),
                 TextButton.icon(
                   onPressed: () async {
-                    await Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => const InterestSelectionScreen(),
-                      ),
-                    );
+                    final result = await Navigator.of(context)
+                        .push<List<String>>(
+                          MaterialPageRoute(
+                            builder: (_) => InterestSelectionScreen(
+                              initialInterestIds: _selectedInterestIds,
+                            ),
+                          ),
+                        );
+
+                    if (result == null || !mounted) {
+                      return;
+                    }
+
+                    setState(() {
+                      _selectedInterestIds = result;
+                    });
                   },
                   icon: const Icon(Icons.edit_outlined, size: 17),
                   label: const Text('edit'),
@@ -239,7 +255,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             ),
             const SizedBox(height: 8),
             InterestList(
-              interestIds: profile.interestIds,
+              interestIds: _selectedInterestIds,
               emptyText: 'what are you interested in?',
               alignment: WrapAlignment.center,
             ),

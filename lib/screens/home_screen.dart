@@ -97,7 +97,7 @@ class _FollowingTab extends StatelessWidget {
     }
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(10, 6, 10, 100),
+      padding: const EdgeInsets.fromLTRB(10, 15, 10, 100),
       children: posts.map((post) {
         return FeedCard(
           post: post,
@@ -135,7 +135,7 @@ class _EmptyFollowingView extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'your home feed is quiet',
+              'Your home feed is quiet, take a moment to breathe 😌',
               textAlign: TextAlign.center,
               style: text.quicksandHeading.copyWith(
                 fontSize: 21,
@@ -144,7 +144,7 @@ class _EmptyFollowingView extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'follow people from Discover to see their glimmers here.',
+              'Glimmer is more fun when you follow people and add friends! ❤️',
               textAlign: TextAlign.center,
               style: text.quicksandBody.copyWith(
                 color: colors.onSurface.withValues(alpha: 0.68),
@@ -202,7 +202,8 @@ class _DiscoverTab extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => const InterestSelectionScreen(),
+                    builder: (_) =>
+                        const InterestSelectionScreen(initialInterestIds: []),
                   ),
                 );
               },

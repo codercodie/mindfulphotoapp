@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../content/interests.dart';
-import '../state/profile_store.dart';
 import '../theme/text_styles.dart';
 
-class InterestSelectionScreen extends ConsumerStatefulWidget {
-  const InterestSelectionScreen({super.key});
+class InterestSelectionScreen extends StatefulWidget {
+  final List<String> initialInterestIds;
+
+  const InterestSelectionScreen({super.key, required this.initialInterestIds});
 
   @override
-  ConsumerState<InterestSelectionScreen> createState() =>
+  State<InterestSelectionScreen> createState() =>
       _InterestSelectionScreenState();
 }
 
-class _InterestSelectionScreenState
-    extends ConsumerState<InterestSelectionScreen> {
+class _InterestSelectionScreenState extends State<InterestSelectionScreen> {
   static const int minimumInterests = 3;
   static const int maximumInterests = 15;
 
@@ -23,10 +22,7 @@ class _InterestSelectionScreenState
   @override
   void initState() {
     super.initState();
-
-    final profile = ref.read(profileStoreProvider);
-
-    _selectedInterestIds = {...profile.interestIds};
+    _selectedInterestIds = {...widget.initialInterestIds};
   }
 
   void _toggleInterest(String interestId) {
@@ -34,12 +30,13 @@ class _InterestSelectionScreenState
 
     if (!isSelected && _selectedInterestIds.length >= maximumInterests) {
       final messenger = ScaffoldMessenger.of(context);
-
       messenger.clearSnackBars();
       messenger.showSnackBar(
-        const SnackBar(content: Text('you can select up to 15 interests.')),
+        const SnackBar(
+          content: Text('you can select up to 15 interests.'),
+          duration: Duration(seconds: 2),
+        ),
       );
-
       return;
     }
 
@@ -52,23 +49,26 @@ class _InterestSelectionScreenState
     });
   }
 
-  void _save() {
+  void _saveInterests() {
     if (_selectedInterestIds.length < minimumInterests) {
+      final messenger = ScaffoldMessenger.of(context);
+      messenger.clearSnackBars();
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('choose at least 3 interests.'),
+          duration: Duration(seconds: 2),
+        ),
+      );
       return;
     }
 
-    ref
-        .read(profileStoreProvider.notifier)
-        .updateInterests(_selectedInterestIds.toList());
-
-    Navigator.of(context).pop();
+    Navigator.of(context).pop<List<String>>(_selectedInterestIds.toList());
   }
 
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final colors = Theme.of(context).colorScheme;
-
     final enoughSelected = _selectedInterestIds.length >= minimumInterests;
 
     return Scaffold(
@@ -81,32 +81,37 @@ class _InterestSelectionScreenState
           children: [
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+                padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
                 children: [
                   Text(
                     'what catches your interest?',
-                    style: text.quicksandHeading.copyWith(fontSize: 24),
+                    style: text.quicksandHeading.copyWith(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 7),
                   Text(
                     'choose at least 3 so we can suggest people '
                     'you might enjoy following.',
                     style: text.quicksandBody.copyWith(
-                      color: colors.onSurface.withValues(alpha: 0.62),
+                      color: colors.onSurface.withValues(alpha: 0.68),
+                      height: 1.35,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   Text(
-                    '${_selectedInterestIds.length}/$maximumInterests selected',
+                    '${_selectedInterestIds.length}/'
+                    '$maximumInterests selected',
                     style: text.quicksandSmall.copyWith(
                       color: colors.primary,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 22),
                   Wrap(
                     spacing: 9,
-                    runSpacing: 9,
+                    runSpacing: 10,
                     children: interestOptions.map((interest) {
                       final isSelected = _selectedInterestIds.contains(
                         interest.id,
@@ -120,6 +125,22 @@ class _InterestSelectionScreenState
                         onSelected: (_) {
                           _toggleInterest(interest.id);
                         },
+                        selectedColor: colors.primary,
+                        backgroundColor: colors.surface,
+                        labelStyle: text.quicksandBody.copyWith(
+                          color: isSelected
+                              ? colors.onPrimary
+                              : colors.onSurface,
+                        ),
+                        side: BorderSide(
+                          color: isSelected
+                              ? colors.primary
+                              : colors.onSurface.withValues(alpha: 0.28),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 9,
+                        ),
                       );
                     }).toList(),
                   ),
@@ -129,8 +150,16 @@ class _InterestSelectionScreenState
             Container(
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
+              decoration: BoxDecoration(
+                color: colors.surface.withValues(alpha: 0.96),
+                border: Border(
+                  top: BorderSide(
+                    color: colors.onSurface.withValues(alpha: 0.06),
+                  ),
+                ),
+              ),
               child: ElevatedButton(
-                onPressed: enoughSelected ? _save : null,
+                onPressed: enoughSelected ? _saveInterests : null,
                 child: Text(
                   enoughSelected ? 'save interests' : 'choose at least 3',
                 ),

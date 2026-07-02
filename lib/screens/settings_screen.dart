@@ -26,7 +26,7 @@ class SettingsScreen extends ConsumerWidget {
         children: [
           const _SectionHeading(
             title: 'theme',
-            description: 'choose your theme and color palette.',
+            description: 'choose your palette',
           ),
           const SizedBox(height: 10),
 
@@ -147,23 +147,12 @@ class SettingsScreen extends ConsumerWidget {
             contentPadding: EdgeInsets.zero,
             secondary: const Icon(Icons.notifications_outlined),
             title: const Text('daily prompt reminder'),
-            subtitle: const Text('remind me when the daily prompt is ready.'),
+            subtitle: const Text('remind me each day to capture a glimmer.'),
             value: settings.dailyPromptReminder,
             onChanged: (value) {
               ref
                   .read(appSettingsProvider.notifier)
                   .setDailyPromptReminder(value);
-            },
-          ),
-
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            secondary: const Icon(Icons.motion_photos_off_outlined),
-            title: const Text('reduce motion'),
-            subtitle: const Text('use fewer animations and transitions.'),
-            value: settings.reduceMotion,
-            onChanged: (value) {
-              ref.read(appSettingsProvider.notifier).setReduceMotion(value);
             },
           ),
 

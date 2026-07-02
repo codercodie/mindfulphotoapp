@@ -135,44 +135,46 @@ class ProfileScreen extends ConsumerWidget {
             ],
           ),
           if (hasBio) ...[
-            const SizedBox(height: 15),
+            const SizedBox(height: 20),
             Text(
               profile.bio!.trim(),
-              style: text.quicksandBody.copyWith(fontSize: 18, height: 1.35),
+              style: text.quicksandBody.copyWith(fontSize: 14, height: 1.35),
             ),
           ],
           if (profile.interestIds.isNotEmpty) ...[
-            const SizedBox(height: 10),
-            SizedBox(
-              height: 38,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  if (profile.interestIds.length > 5)
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () {
-                          _showAllInterests(
-                            context,
-                            profile.displayName,
-                            profile.interestIds,
-                          );
-                        },
-                        child: const Text('see all'),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 5),
             InterestList(
               interestIds: profile.interestIds,
-              maxItems: 6,
-              alignment: WrapAlignment.center,
+              maxItems: 10,
+              alignment: WrapAlignment.spaceEvenly,
             ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Spacer(),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: profile.interestIds.length > 10
+                        ? TextButton(
+                            onPressed: () {
+                              _showAllInterests(
+                                context,
+                                profile.displayName,
+                                profile.interestIds,
+                              );
+                            },
+                            child: const Text('see all 👀'),
+                          )
+                        : null,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 5),
           ],
-          const SizedBox(height: 24),
+          const SizedBox(height: 10),
           Row(
             children: [
               ProfileStat(
@@ -189,21 +191,13 @@ class ProfileScreen extends ConsumerWidget {
               ),
             ],
           ),
-          const SizedBox(height: 28),
-          Text(
-            'glimmers',
-            style: text.quicksandHeading.copyWith(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 20),
           if (profilePosts.isEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 28),
               child: Center(
                 child: Text(
-                  'no glimmers yet',
+                  'no posts yet 🥺',
                   textAlign: TextAlign.center,
                   style: text.quicksandBody.copyWith(
                     fontSize: 15,
